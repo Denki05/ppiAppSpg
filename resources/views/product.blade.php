@@ -41,21 +41,7 @@
            paging: true,           // Enable pagination
            pageLength: 5,          // Number of records per page
            lengthMenu: [25, 50, 100], // Dropdown menu options for page length
-           dom: 'Bfrtip',           // Dom structure for buttons
-           buttons: [
-               { extend: 'copy' },
-               { extend: 'excel' },
-               { extend: 'pdf' },
-               { extend: 'print' }
-           ],
-           language: {
-               paginate: {
-                   first: "First",
-                   last: "Last",
-                   next: "Next",
-                   previous: "Previous"
-               }
-           }
+           
        });
    });
 </script>

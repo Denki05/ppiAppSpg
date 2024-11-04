@@ -9,9 +9,6 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -19,6 +16,9 @@
     
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
     <!-- jQuery and Bootstrap (for DataTables) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -71,9 +71,11 @@
                                     <i class="fa-solid fa-gears"></i> Setting
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" href="{{ url('/admin/users') }}"></a></li>
-                                    <li><a class="dropdown-item" href="{{ url('/admin/settings') }}"></a></li>
-                                    <li><a class="dropdown-item" href="{{ url('/admin/reports') }}"></a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.users') }}">
+                                            <i class="fa fa-users" aria-hidden="true"></i> Manage Users
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             @endif
@@ -83,12 +85,7 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
                         @guest
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">Login</a>
-                            </li> -->
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register') }}">Register</a>
-                            </li> -->
+                            <!-- Guest links if needed (e.g., Login, Register) -->
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
