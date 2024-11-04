@@ -2,10 +2,12 @@
 
 @section('content')
 <div class="container">
-    <!-- <nav class="breadcrumb bg-white push">
-        <span class="breadcrumb-item">Product</span>
-        <span class="breadcrumb-item active">Index</span>
-    </nav> -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Product</li>
+        </ol>
+    </nav>
 
     <div class="row justify-content-center">
         <div class="col-md-12">
