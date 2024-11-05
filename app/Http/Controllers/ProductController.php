@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\ApiConsumerController;
 use Auth;
 
 
@@ -13,9 +14,13 @@ class ProductController extends Controller
         $this->middleware('auth');
     }
 
-    // Use the getItemsProducts method from ApiConsumerController
-    public function index(ApiConsumerController $apiConsumer)
+    public function index()
     {
-        return $apiConsumer->getItemsProducts();
+        // Get product data using ApiConsumerController
+        $apiConsumer = new ApiConsumerController();
+        $data['products'] = $apiConsumer->getItemsProducts();
+
+        // Pass the product data to the view
+        return view('product', $data);
     }
 }

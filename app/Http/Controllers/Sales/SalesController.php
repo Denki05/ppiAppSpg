@@ -1,0 +1,101 @@
+<?php
+
+namespace App\Http\Controllers\Sales;
+
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiConsumerController;
+use App\Models\Penjualan\SalesOrder;
+use App\Models\Penjualan\SalesOrderItem;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class SalesController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    public function index()
+    {
+        $data['sales'] = SalesOrder::get();
+
+        return view('penjualan.index', $data);
+    }
+
+    public function create(Request $request)
+    {
+        // Fetch product data from ApiConsumerController
+        $apiConsumer = new ApiConsumerController();
+        $data['products'] = $apiConsumer->getItemsProducts();
+        $data['brands'] = $apiConsumer->getItemsBrands();
+        
+        // Fetch unit weight constants from the model
+        $data['unit_weights'] = SalesOrderItem::UNIT_WEIGHT;
+
+        // Pass the product and unit weight data to the view
+        return view('penjualan.create', $data);
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            DB::beginTransaction(); // Start a transaction
+
+            // Validate the request data
+            $validated = $request->validate([
+                'tanggal_order' => 'required|date',
+                'brand' => 'required|string|max:50',
+                'nama_customer' => 'required|string|max:255',
+                'alamat_customer' => 'required|string|max:255',
+                'kontak_person' => 'required|string|max:255',
+                'telpon' => 'nullable|string|max:20',
+                'products' => 'required|array',
+                'products.*.variant' => 'required', // No database check because it’s from API
+                'products.*.quantity' => 'required|integer|min:1',
+                'products.*.unit_weight' => 'required|in:1,2' // Assuming 1 => 'ML', 2 => 'KG'
+            ]);
+
+            // Generate a unique sales order code
+            $salesOrderCode = SalesOrder::generateSO();
+
+            // Create the sales order
+            $salesOrder = SalesOrder::create([
+                'kode' => $salesOrderCode,
+                'tanggal_order' => $validated['tanggal_order'],
+                'brand' => $validated['brand'],
+                'nama_customer' => $validated['nama_customer'],
+                'alamat_customer' => $validated['alamat_customer'],
+                'kontak_person' => $validated['kontak_person'],
+                'telpon' => $validated['telpon'],
+                'status' => 1,
+                'created_by' => Auth::user()->id,
+            ]);
+
+            // Loop through the products array and create order items
+            foreach ($validated['products'] as $product) {
+
+                SalesOrderItem::create([
+                    'so_id' => $salesOrder->id,
+                    'product_id' => $product['variant'],
+                    'qty' => $product['quantity'],
+                    'unit_weight' => $product['unit_weight']
+                ]);
+            }
+
+            DB::commit(); // Commit the transaction
+
+            return redirect()->route('penjualan.index')->with('success', 'Sale created successfully.');
+        } catch (\Exception $e) {
+            dd($e);
+            DB::rollBack(); // Rollback on error
+            Log::error('Error creating sale: ' . $e->getMessage());
+
+            return redirect()->route('penjualan.create')
+                ->withErrors(['error' => 'Failed to create sale. Please try again later.'])
+                ->withInput();
+        }
+    }
+}
