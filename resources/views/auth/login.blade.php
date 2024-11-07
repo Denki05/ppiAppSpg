@@ -1,13 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-image" style="background-image: url('{{ asset('media/images/background_auth.jpg') }}'); 
-            background-size: cover; 
-            background-repeat: no-repeat; 
-            background-position: center; 
-            min-height: 100vh; 
-            display: flex; 
-            align-items: center;">
+<div>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
