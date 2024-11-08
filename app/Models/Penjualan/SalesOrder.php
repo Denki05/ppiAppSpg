@@ -13,10 +13,7 @@ class SalesOrder extends Model
         'kode', 
         'tanggal_order',
         'brand', 
-        'nama_customer', 
-        'alamat_customer', 
-        'kontak_person', 
-        'telpon', 
+        'customer_id', 
         'status'
     ];
 

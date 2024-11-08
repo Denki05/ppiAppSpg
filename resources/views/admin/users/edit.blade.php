@@ -29,6 +29,7 @@
             <select name="role" id="role" class="form-control" required>
                 <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                <option value="spg" {{ $user->role == 'spg' ? 'selected' : '' }}>Spg</option>
             </select>
         </div>
 
@@ -43,6 +44,22 @@
             <label for="password_confirmation">Confirm Password</label>
             <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Leave blank if not changing">
         </div>
+
+        <hr>
+
+        <div class="row g-3 mt-4">
+            <div class="col-md-6">
+                <label for="provinsi" class="form-label">Provinsi <span class="text-danger">*</span></label>
+                <select name="provinsi" id="provinsi" class="form-control select2" required style="width: 100%;">
+                    <option value="">Pilih Provinsi</option>
+                    @foreach($provinsi as $item)
+                        <option value="{{ $item['id'] }}">{{ $item['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <br>
 
         <a class="btn btn-danger" href="{{ route('admin.users') }}" role="button">Back</a>
         <button type="submit" class="btn btn-primary">Save</button>

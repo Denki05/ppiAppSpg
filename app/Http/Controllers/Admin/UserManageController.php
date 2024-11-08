@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiConsumerController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash; // Add this line
@@ -49,7 +50,11 @@ class UserManageController extends Controller
 
     public function edit($id)
     {
+        $apiConsumer = new ApiConsumerController();
+
         $data['user'] = User::findOrFail($id);
+        $data['provinsi'] = $apiConsumer->getProvince();
+
         return view('admin.users.edit', $data);
     }
 

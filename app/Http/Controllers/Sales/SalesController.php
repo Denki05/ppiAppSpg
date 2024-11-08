@@ -31,9 +31,6 @@ class SalesController extends Controller
         $apiConsumer = new ApiConsumerController();
         $data['products'] = $apiConsumer->getItemsProducts();
         $data['brands'] = $apiConsumer->getItemsBrands();
-        
-        // Fetch unit weight constants from the model
-        $data['unit_weights'] = SalesOrderItem::UNIT_WEIGHT;
 
         // Pass the product and unit weight data to the view
         return view('penjualan.create', $data);

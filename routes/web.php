@@ -25,6 +25,7 @@ Auth::routes();
 // GET API
 Route::get('/product', [ApiConsumerController::class, 'getItemsProducts'])->name('product');
 Route::get('/brands', [ApiConsumerController::class, 'getItemsBrands'])->name('brands');
+Route::get('/provinsi', [ApiConsumerController::class, 'getProvince'])->name('provinsi');
 
 // Route for fetching products based on brand ID (for dependent dropdown)
 Route::get('/product/brand/{brand}', [ApiConsumerController::class, 'getProductsByBrand']);
