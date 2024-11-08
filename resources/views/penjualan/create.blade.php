@@ -63,7 +63,7 @@ $(document).ready(function() {
             success: function(data) {
                 selectElement.empty().append('<option value="">Select Product</option>');
                 data.forEach(function(product) {
-                    selectElement.append(`<option value="${product.id}">${product.code} - ${product.name}</option>`);
+                    selectElement.append(`<option value="${product.id}">${product.name}</option>`);
                 });
             },
             error: function() {
