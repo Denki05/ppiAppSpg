@@ -103,7 +103,9 @@ $(document).ready(function() {
                     <input type="number" name="${brand.toLowerCase()}Products[${rowIndex}][quantity]" class="form-control" required min="1">
                 </td>
                 <td class="text-center" style="width: 5%">
-                    <button type="button" class="btn btn-danger removeRow">Remove</button>
+                    <button type="button" class="btn btn-danger removeRow">
+                        <i class="fa fa-trash"></i>
+                    </button>
                 </td>
             </tr>`;
         
