@@ -36,6 +36,7 @@
                 </thead>
                 <tbody>
                     @foreach($sales as $sale)
+                        @if($sale->status == 1)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td class="text-center">{{ $sale->kode }}</td>
@@ -45,17 +46,20 @@
                                 <a class="btn btn-info" href="" role="button">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </a>
-                                <a class="btn btn-warning" href="" role="button">
+                                <!-- <a class="btn btn-warning" href="" role="button">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
-                                </a>
-                                <a class="btn btn-danger" href="" role="button">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </a>
-                                <a class="btn btn-primary" href="" role="button">
+                                </a> -->
+                                <form action="{{ route('penjualan.destroy', $sale->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                </form>
+                                <!-- <a class="btn btn-primary" href="" role="button">
                                     <i class="fa fa-print" aria-hidden="true"></i>
-                                </a>
+                                </a> -->
                             </td>
                         </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>

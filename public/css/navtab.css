@@ -1,0 +1,27 @@
+/* custom.css */
+
+.nav-tabs .nav-link {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.tab-pane {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-top: none;
+}
+
+.tab-pane h3 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.tab-pane p {
+    font-size: 1rem;
+    color: #666;
+}

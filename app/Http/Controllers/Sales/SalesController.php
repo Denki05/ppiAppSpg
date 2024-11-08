@@ -87,7 +87,13 @@ class SalesController extends Controller
 
             DB::commit(); // Commit the transaction
 
-            return redirect()->route('penjualan.index')->with('success', 'Sale created successfully.');
+            if(Auth::user()->role == "spg") {
+                return redirect()->route('penjualan.create')->with('success', 'Sale created successfully.');
+            } else {
+                return redirect()->route('penjualan.index')->with('success', 'Sale created successfully.');
+            }
+
+            
         } catch (\Exception $e) {
             dd($e);
             DB::rollBack(); // Rollback on error
@@ -96,6 +102,26 @@ class SalesController extends Controller
             return redirect()->route('penjualan.create')
                 ->withErrors(['error' => 'Failed to create sale. Please try again later.'])
                 ->withInput();
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            // Find the sales order by its ID
+            $sales = SalesOrder::findOrFail($id);
+
+            // Delete the sales order
+            $sales->status = 0 ;
+            $sales->updated_by = Auth::user()->id;
+            $sales->save();
+
+            // Redirect back with success message
+            return redirect()->route('penjualan.index')->with('success', 'Sales order deleted successfully.');
+
+        } catch (\Exception $e) {
+            // Handle the error and redirect back with error message
+            return redirect()->route('penjualan.index')->with('error', 'Failed to delete sales order.');
         }
     }
 }

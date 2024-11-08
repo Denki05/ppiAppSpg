@@ -32,7 +32,7 @@ class ApiConsumerController extends Controller
         return response()->json(['error' => 'Failed to fetch data'], 500);
     }
 
-    public function getProductsByBrand($brandName)
+    public function getProductsByBrand($brand)
     {
         // Fetch all products
         $response = Http::get("http://ppiapps.sytes.net:8000/api/products");
@@ -41,8 +41,8 @@ class ApiConsumerController extends Controller
             $products = $response->json();
 
             // Filter products based on the selected brand name
-            $filteredProducts = array_filter($products, function ($product) use ($brandName) {
-                return isset($product['brand_name']) && $product['brand_name'] === $brandName;
+            $filteredProducts = array_filter($products, function ($product) use ($brand) {
+                return isset($product['brand_name']) && $product['brand_name'] === $brand;
             });
 
             return response()->json(array_values($filteredProducts));

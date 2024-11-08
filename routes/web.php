@@ -27,7 +27,7 @@ Route::get('/product', [ApiConsumerController::class, 'getItemsProducts'])->name
 Route::get('/brands', [ApiConsumerController::class, 'getItemsBrands'])->name('brands');
 
 // Route for fetching products based on brand ID (for dependent dropdown)
-Route::get('/product/brand/{brandName}', [ApiConsumerController::class, 'getProductsByBrand']);
+Route::get('/product/brand/{brand}', [ApiConsumerController::class, 'getProductsByBrand']);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -46,6 +46,7 @@ Route::delete('/admin/users/{id}', [UserManageController::class, 'destroy'])->na
 Route::get('/penjualan', [SalesController::class, 'index'])->name('penjualan.index');
 Route::get('/penjualan/create', [SalesController::class, 'create'])->name('penjualan.create');
 Route::post('/penjualan/store', [SalesController::class, 'store'])->name('penjualan.store');
+Route::delete('/penjualan/{id}', [SalesController::class, 'destroy'])->name('penjualan.destroy');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {

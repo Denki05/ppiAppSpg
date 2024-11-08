@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2>Create Sale</h2>
+<div class="container mt-4">
+    <h2>#Input Penjualan</h2>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -14,164 +14,111 @@
         </div>
     @endif
 
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <form action="{{ route('penjualan.store') }}" method="POST" class="row g-3">
         @csrf
 
-        <div class="row g-3 mt-4">
-            <div class="col-md-6">
-                <label for="tanggal_order" class="form-label">Tanggal <span class="text-danger">*</span></label>
-                <input type="date" name="tanggal_order" class="form-control" id="tanggal_order" required>
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" id="brandTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="gcf-tab" data-bs-toggle="tab" href="#gcf" role="tab" aria-controls="gcf" aria-selected="true" data-brand="GCF">GCF</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="senses-tab" data-bs-toggle="tab" href="#senses" role="tab" aria-controls="senses" aria-selected="false" data-brand="Senses">SENSES</a>
+            </li>
+        </ul>
+
+        <!-- Tabs Content -->
+        <div class="tab-content" id="brandTabsContent">
+            <!-- GCF Tab Content -->
+            <div class="tab-pane fade show active" id="gcf" role="tabpanel" aria-labelledby="gcf-tab">
+                @include('penjualan.partials.sales_form', ['brand' => 'GCF'])
             </div>
 
-            <div class="col-md-6">
-                <label for="brand" class="form-label">Brand <span class="text-danger">*</span></label>
-                <select name="brand" id="brand" class="form-control select2" required>
-                    <option value="">Pilih Brand</option>
-                    @foreach($brands as $brand)
-                        <option value="{{ $brand['brand_name'] }}">{{ $brand['brand_name'] }}</option>
-                    @endforeach
-                </select>
+            <!-- Senses Tab Content -->
+            <div class="tab-pane fade" id="senses" role="tabpanel" aria-labelledby="senses-tab">
+                @include('penjualan.partials.sales_form', ['brand' => 'Senses'])
             </div>
-
-            <div class="col-md-6">
-                <label for="nama_customer" class="form-label">Nama Customer (Toko) <span class="text-danger">*</span></label>
-                <input type="text" name="nama_customer" class="form-control" id="nama_customer" required>
-            </div>
-
-            <div class="col-md-6">
-                <label for="alamat_customer" class="form-label">Alamat Customer (Toko) <span class="text-danger">*</span></label>
-                <input type="text" name="alamat_customer" class="form-control" id="alamat_customer" required>
-            </div>
-
-            <div class="col-md-6">
-                <label for="kontak_person" class="form-label">Owner / Contact Person <span class="text-danger">*</span></label>
-                <input type="text" name="kontak_person" class="form-control" id="kontak_person" required>
-            </div>
-
-            <div class="col-md-6">
-                <label for="telpon" class="form-label">Telephone</label>
-                <input type="text" name="telpon" class="form-control" id="telpon">
-            </div>
-        </div>
-
-        <div class="row g-3 mt-4">
-            <hr>
-            <div class="col-12">
-                <button type="button" class="btn btn-success" id="addRow"><i class="fa fa-plus" aria-hidden="true"></i> Add Row</button>
-                <table id="salesTable" class="table table-striped mt-3">
-                    <thead>
-                        <tr>
-                            <th class="text-center">#</th>
-                            <th class="text-center">Variant</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-center">Unit Weight</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- JavaScript will dynamically add rows here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="col-12 mt-4">
-            <a class="btn btn-danger" href="{{ route('penjualan.index') }}" role="button">Back</a>
-            <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </form>
 </div>
-
 @endsection
 
 @section('scripts')
 <script>
 $(document).ready(function() {
-    // Initialize Select2
+    // Initialize Select2 for all dropdowns
     $('.select2').select2();
 
-    let productOptions = []; // Store product options for the selected brand
+    // Function to load products for a selected brand and populate the select element
+    function loadProductsForBrand(brand, selectElement) {
+        $.ajax({
+            url: '/product/brand/' + brand,
+            method: 'GET',
+            success: function(data) {
+                selectElement.empty().append('<option value="">Select Product</option>');
+                data.forEach(function(product) {
+                    selectElement.append(`<option value="${product.id}">${product.code} - ${product.name}</option>`);
+                });
+            },
+            error: function() {
+                alert('Failed to load products for brand: ' + brand);
+            }
+        });
+    }
 
-    // Load products based on selected brand
-    $('#brand').change(function() {
-        const brandName = $(this).val();
-        const tableBody = $('#salesTable tbody');
-
-        // Clear previous rows when brand is changed
-        tableBody.empty();
-
-        if (brandName) {
-            $.ajax({
-                url: '/product/brand/' + brandName,
-                method: 'GET',
-                success: function(data) {
-                    if (data.length > 0) {
-                        // Map product data to options
-                        productOptions = data.map(product => `<option value="${product.id}">${product.code} - ${product.name}</option>`).join('');
-                    } else {
-                        productOptions = []; // Reset if no products found
-                    }
-                },
-                error: function() {
-                    alert('Failed to load products.');
-                }
-            });
-        } else {
-            productOptions = []; // Reset if no brand selected
-        }
+    // Load products for the active tab on tab switch
+    $('#brandTabs a').on('shown.bs.tab', function (e) {
+        const brand = $(e.target).data('brand');
+        const tableBody = $(`#${brand.toLowerCase()}Table tbody`);
+        const selectElement = tableBody.find('select[name^="' + brand.toLowerCase() + 'Products[0][variant]"]');
+        loadProductsForBrand(brand, selectElement);
     });
 
-    // Add row to sales table
-    $('#addRow').click(function() {
-        const tableBody = $('#salesTable tbody');
-        const rowIndex = tableBody.find('tr').length + 1; // Get current row count
+    // Initial load for the active tab
+    const activeBrand = $('#brandTabs .nav-link.active').data('brand');
+    loadProductsForBrand(activeBrand, $(`#${activeBrand.toLowerCase()}Table tbody select[name^="${activeBrand.toLowerCase()}Products[0][variant]"]`));
 
-        // Create a new row with the current product options
+    // Adding new product row based on the active tab
+    $(document).on('click', '.addRow', function() {
+        const brand = $(this).data('brand');
+        const tableBody = $(`#${brand.toLowerCase()}Table tbody`);
+        const rowIndex = tableBody.find('tr').length;
+
+        // Create a new row with the correct product select
         const newRow = `
             <tr>
-                <td class="text-center">${rowIndex}</td>
                 <td class="text-center">
-                    <select name="products[${rowIndex}][variant]" class="form-control select2" required>
+                    <select name="${brand.toLowerCase()}Products[${rowIndex}][variant]" class="form-control select2" required>
                         <option value="">Select Product</option>
-                        ${productOptions} <!-- Use the current product options -->
+                        <!-- Options will load based on brand selection -->
                     </select>
                 </td>
                 <td class="text-center">
-                    <input type="number" name="products[${rowIndex}][quantity]" class="form-control" required min="1">
-                </td>
-                <td class="text-center">
-                    <select name="products[${rowIndex}][unit_weight]" class="form-control select2" required>
-                        <option value="">-- Select Unit --</option>
-                        @foreach($unit_weights as $key => $value)
-                            <option value="{{ $key }}">{{ $value }}</option>
-                        @endforeach
-                    </select>
+                    <input type="number" name="${brand.toLowerCase()}Products[${rowIndex}][quantity]" class="form-control" required min="1">
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger removeRow">Remove</button>
                 </td>
             </tr>`;
+        
         tableBody.append(newRow);
-        $('.select2').select2(); // Reinitialize Select2 for the new dropdowns
+        $('.select2').select2(); // Reinitialize Select2 for newly added rows
+
+        // Load products in the newly added select element
+        const selectElement = tableBody.find(`select[name="${brand.toLowerCase()}Products[${rowIndex}][variant]"]`);
+        loadProductsForBrand(brand, selectElement);
     });
 
-    // Remove row from table and re-index
+    // Remove a row from the product table
     $(document).on('click', '.removeRow', function() {
         $(this).closest('tr').remove();
-        reIndexRows(); // Call re-indexing function
     });
-
-    // Function to re-index rows
-    function reIndexRows() {
-        $('#salesTable tbody tr').each(function(index) {
-            $(this).find('td:first').text(index + 1); // Update the row number
-            $(this).find('select[name^="products"]').each(function() {
-                const name = $(this).attr('name');
-                const newName = name.replace(/products\[\d+\]/, `products[${index + 1}]`);
-                $(this).attr('name', newName); // Update the name attribute
-            });
-        });
-    }
 });
 </script>
 @endsection
