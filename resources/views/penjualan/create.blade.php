@@ -93,13 +93,13 @@ $(document).ready(function() {
         // Create a new row with the correct product select
         const newRow = `
             <tr>
-                <td class="text-center" style="width: 20%">
+                <td class="text-center" style="width: 25%">
                     <select name="${brand.toLowerCase()}Products[${rowIndex}][variant]" class="form-control select2" required>
                         <option value="">Select Product</option>
                         <!-- Options will load based on brand selection -->
                     </select>
                 </td>
-                <td class="text-center" style="width: 15%">
+                <td class="text-center" style="width: 20%">
                     <input type="number" name="${brand.toLowerCase()}Products[${rowIndex}][quantity]" class="form-control" required min="1">
                 </td>
                 <td class="text-center" style="width: 5%">

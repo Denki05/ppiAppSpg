@@ -35,9 +35,9 @@
         <table id="{{ strtolower($brand) }}Table" class="table table-striped mt-3">
             <thead>
                 <tr>
-                    <th class="text-center" style="width: 20%">Variant</th>
-                    <th class="text-center" style="width: 15%">Qty</th>
-                    <th class="text-center" style="width: 10%">Action</th>
+                    <th class="text-center">Variant</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-center"></th>
                 </tr>
             </thead>
             <tbody>
