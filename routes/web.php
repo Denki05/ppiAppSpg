@@ -25,7 +25,6 @@ Auth::routes();
 // GET API
 Route::get('/product', [ApiConsumerController::class, 'getItemsProducts'])->name('product');
 Route::get('/brands', [ApiConsumerController::class, 'getItemsBrands'])->name('brands');
-Route::get('/provinsi', [ApiConsumerController::class, 'getProvince'])->name('provinsi');
 
 // Route for fetching products based on brand ID (for dependent dropdown)
 Route::get('/product/brand/{brand}', [ApiConsumerController::class, 'getProductsByBrand']);
@@ -42,6 +41,7 @@ Route::post('/admin/users', [UserManageController::class, 'store'])->name('admin
 Route::get('/admin/users/{id}/edit', [UserManageController::class, 'edit'])->name('admin.users.edit');
 Route::put('/admin/users/{id}', [UserManageController::class, 'update'])->name('admin.users.update');
 Route::delete('/admin/users/{id}', [UserManageController::class, 'destroy'])->name('admin.users.destroy');
+Route::get('/admin/users/getCities/{prov_id}', [UserManageController::class, 'getCities'])->name('admin.users.getCities');
 
 // Penjualan
 Route::get('/penjualan', [SalesController::class, 'index'])->name('penjualan.index');

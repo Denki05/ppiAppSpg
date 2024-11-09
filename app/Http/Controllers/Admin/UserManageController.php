@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\ApiConsumerController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash; // Add this line
+use DB;
 
 class UserManageController extends Controller
 {
@@ -50,36 +50,57 @@ class UserManageController extends Controller
 
     public function edit($id)
     {
-        $apiConsumer = new ApiConsumerController();
-
         $data['user'] = User::findOrFail($id);
-        $data['provinsi'] = $apiConsumer->getProvince();
+        $data['provinsi'] = DB::table('provinsi')->get();
 
         return view('admin.users.edit', $data);
     }
 
     public function update(Request $request, $id)
     {
+        // Validate request data
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
             'role' => 'required|string',
-            'password' => 'nullable|min:8|confirmed' // Validate password only if provided, with confirmation
+            'password' => 'nullable|min:8|confirmed', // Only validate password if provided
+            'kota' => 'required',
+            'provinsi' => 'required',
+            'text_provinsi' => 'required|string',
+            'text_kota' => 'required|string',
         ]);
 
+        // dd($request->all());
+
+        // Retrieve the user to update
         $user = User::findOrFail($id);
+        
+        // Update user data
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role = $request->role;
+        $user->kota = $request->kota;
+        $user->provinsi = $request->provinsi;
+        $user->text_provinsi = $request->text_provinsi;
+        $user->text_kota = $request->text_kota;
 
         // Update password only if a new password is provided
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password); // Use Hash::make instead of bcrypt
+            $user->password = Hash::make($request->password);
         }
 
-        $user->save();
-
-        return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+        // Use a transaction to save changes
+        try {
+            DB::beginTransaction();
+            
+            $user->save();
+            
+            DB::commit();
+            return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withErrors('Failed to update user: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)
@@ -92,5 +113,14 @@ class UserManageController extends Controller
         }
 
         return redirect()->route('admin.users')->with('error', 'User not found.');
+    }
+
+    public function getCities($prov_id)
+    {
+        $cities = DB::table('kabupaten')
+                    ->where('prov_id', $prov_id)
+                    ->get();
+
+        return response()->json($cities); // Return cities as JSON
     }
 }

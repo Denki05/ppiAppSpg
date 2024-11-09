@@ -48,14 +48,23 @@
         <hr>
 
         <div class="row g-3 mt-4">
-            <div class="col-md-6">
+            <div class="col">
                 <label for="provinsi" class="form-label">Provinsi <span class="text-danger">*</span></label>
                 <select name="provinsi" id="provinsi" class="form-control select2" required style="width: 100%;">
                     <option value="">Pilih Provinsi</option>
-                    @foreach($provinsi as $item)
-                        <option value="{{ $item['id'] }}">{{ $item['name'] }}</option>
+                    @foreach($provinsi as $key)
+                    <option value="{{ $key->prov_id }}" {{ old('provinsi', $user->provinsi) == $key->prov_id ? 'selected' : '' }}>{{ $key->prov_name }}</option>
                     @endforeach
                 </select>
+                <input type="hidden" name="text_provinsi" id="text_provinsi" value="{{ old('text_provinsi', $user->text_provinsi) }}">
+            </div>
+
+            <div class="col">
+                <label for="kota" class="form-label">Kota <span class="text-danger">*</span></label>
+                <select name="kota" id="kota" class="form-control select2" required style="width: 100%;">
+                    <option value="">Pilih Kota</option>
+                </select>
+                <input type="hidden" name="text_kota" id="text_kota" value="{{ old('text_kota', $user->text_kota) }}">
             </div>
         </div>
 
@@ -65,4 +74,42 @@
         <button type="submit" class="btn btn-primary">Save</button>
     </form>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+
+        $('#provinsi').on('change', function() {
+            var provinceId = $(this).val();
+            var provinceText = $('#provinsi option:selected').text(); // Get selected text
+            $('#text_provinsi').val(provinceText); // Set to text_provinsi
+
+            $('#kota').html('<option value="">Pilih Kota</option>'); // Reset city dropdown
+            $('#text_kota').val(''); // Reset text_kota field
+
+            if (provinceId) {
+                $.ajax({
+                    url: '/admin/users/getCities/' + provinceId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        $.each(data, function(key, city) {
+                            $('#kota').append(`<option value="${city.city_id}">${city.city_name}</option>`);
+                        });
+                    },
+                    error: function() {
+                        alert('Error loading cities');
+                    }
+                });
+            }
+        });
+
+        $('#kota').on('change', function() {
+            var cityText = $('#kota option:selected').text(); // Get selected text for city
+            $('#text_kota').val(cityText); // Set to text_kota
+        });
+    })
+</script>
 @endsection

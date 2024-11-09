@@ -27,7 +27,9 @@ class User extends Authenticatable
         'password',
         'role',
         'kota', 
-        'provinsi'
+        'provinsi', 
+        'text_kota', 
+        'text_provinsi'
     ];
 
     /**
