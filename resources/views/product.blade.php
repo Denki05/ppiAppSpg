@@ -40,10 +40,10 @@
 <script>
    $(document).ready(function() {
        $('#productTable').DataTable({
-           paging: true,           // Enable pagination
-           pageLength: 5,          // Number of records per page
-           lengthMenu: [25, 50, 100], // Dropdown menu options for page length
-           
+           paging: true,
+           pageLength: 10,
+           lengthMenu: [25, 50, 100],
+           order: [[3, 'asc']],
        });
    });
 </script>

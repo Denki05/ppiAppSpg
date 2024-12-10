@@ -2,53 +2,43 @@
 
 @section('content')
 <div class="container">
-    <h2>Create User</h2>
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
         </div>
     @endif
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="breadcrumb-item" aria-current="page"> Customer</li>
+            <li class="breadcrumb-item active" aria-current="page"> Create</li>
+        </ol>
+    </nav>
 
-    <form action="{{ route('admin.users.store') }}" method="POST">
-    @csrf
+    <form action="{{ route('master.customer.store') }}" method="POST">
+        @csrf
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Nama Toko</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
 
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-        
-        <div class="col-md-6">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
+            <div class="col-md-6">
+                <label for="alamat" class="form-label">Alamat Toko</label>
+                <input type="text" class="form-control" id="alamat" name="alamat" required>
+            </div>
 
-        <div class="col-md-6">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
+            <div class="col-md-6">
+                <label for="phone" class="form-label">Telepon</label>
+                <input type="number" class="form-control" id="phone" name="phone" required>
+            </div>
 
-        <div class="col-md-6">
-            <label for="password_confirmation" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-        </div>
+            <div class="col-md-6">
+                <label for="phone" class="form-label">Owner</label>
+                <input type="text" class="form-control" id="owner" name="owner" required>
+            </div>
 
-        <div class="col-md-12">
-            <label for="role" class="form-label">Role</label>
-            <select class="form-select select2" id="role" name="role" required>
-                <option value="">Pilih Role</option>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-                <option value="spg">Spg</option>
-            </select>
-        </div>
-
-        <div class="col-md-6">
+            <div class="col-md-6">
             <label for="provinsi" class="form-label">Provinsi</label>
             <select class="form-select select2" id="provinsi" name="provinsi" required>
                 <option value="">Pilih Provinsi</option>
@@ -78,15 +68,15 @@
                 <option value="">Pilih Kelurahan</option>
             </select>
         </div>
+        
+        <div class="mt-4">
+            <a class="btn btn-danger" href="{{ route('master.customer.index') }}" role="button">Back</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
     </div>
-
-    <div class="mt-4">
-        <a class="btn btn-danger" href="{{ route('admin.users') }}" role="button">Back</a>
-        <button type="submit" class="btn btn-primary">Create User</button>
-    </div>
-</form>
-
+    </form>
 </div>
+
 @endsection
 
 @section('scripts')
@@ -94,7 +84,7 @@
     $(document).ready(function() {
         $('.select2').select2();
 
-            $('#provinsi').change(function () {
+        $('#provinsi').change(function () {
                 let provinsiID = $(this).val();
                 $('#kota').empty().append('<option value="">Pilih Kota</option>');
 
@@ -150,6 +140,6 @@
                     });
                 }
             });
-    })
+    });
 </script>
 @endsection

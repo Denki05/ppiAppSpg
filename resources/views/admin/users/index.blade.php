@@ -37,7 +37,7 @@
                             <a class="btn btn-warning" href="{{ route('admin.users.edit', $user->id) }}" role="button">
                                 <i class="fa fa-pencil" aria-hidden="true"></i>
                             </a>
-                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah anda yakin menghapus penjualan ini?');">
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah anda yakin menghapus akun ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>

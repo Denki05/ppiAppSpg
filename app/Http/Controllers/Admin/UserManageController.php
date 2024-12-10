@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Master\Provinsi;
+use App\Models\Master\Kabupaten;
+use App\Models\Master\Kelurahan;
+use App\Models\Master\Kecamatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash; // Add this line
 use DB;
@@ -18,12 +22,16 @@ class UserManageController extends Controller
     public function index() 
     {
         $data['users'] = User::all();
+
         return view('admin.users.index', $data);
     }
 
     public function create()
     {
-        return view('admin.users.create');
+
+        $data['provinsi'] = Provinsi::all();
+
+        return view('admin.users.create', $data);
     }
 
     public function store(Request $request)
@@ -42,6 +50,10 @@ class UserManageController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password), // Hash the password
             'role' => $request->role,
+            'provinsi_id' => $request->provinsi,
+            'kabupaten_id' => $request->kota,
+            'kecamatan_id' => $request->kecamatan,
+            'kelurahan_id' => $request->kelurahan,
         ]);
 
         // Redirect back with a success message
@@ -51,7 +63,10 @@ class UserManageController extends Controller
     public function edit($id)
     {
         $data['user'] = User::findOrFail($id);
-        $data['provinsi'] = DB::table('provinsi')->get();
+        $data['provinsi'] = Provinsi::get();
+        $data['kabupaten'] = Kabupaten::get();
+        $data['kelurahan'] = Kelurahan::get();
+        $data['kecamatan'] = Kecamatan::get();
 
         return view('admin.users.edit', $data);
     }
@@ -63,11 +78,7 @@ class UserManageController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
             'role' => 'required|string',
-            'password' => 'nullable|min:8|confirmed', // Only validate password if provided
-            'kota' => 'required',
-            'provinsi' => 'required',
-            'text_provinsi' => 'required|string',
-            'text_kota' => 'required|string',
+            'password' => 'nullable|min:8|confirmed',
         ]);
 
         // dd($request->all());
@@ -79,10 +90,10 @@ class UserManageController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role = $request->role;
-        $user->kota = $request->kota;
-        $user->provinsi = $request->provinsi;
-        $user->text_provinsi = $request->text_provinsi;
-        $user->text_kota = $request->text_kota;
+        $user->provinsi_id = $request->provinsi;
+        $user->kabupaten_id = $request->kota;
+        $user->kecamatan_id = $request->kecamatan;
+        $user->kelurahan_id = $request->kelurahan;
 
         // Update password only if a new password is provided
         if ($request->filled('password')) {
@@ -115,12 +126,24 @@ class UserManageController extends Controller
         return redirect()->route('admin.users')->with('error', 'User not found.');
     }
 
-    public function getCities($prov_id)
+    public function getKabupaten($provinsiID)
     {
-        $cities = DB::table('kabupaten')
-                    ->where('prov_id', $prov_id)
-                    ->get();
+        $kabupaten = Kabupaten::where('province_id', $provinsiID)->get();
 
-        return response()->json($cities); // Return cities as JSON
+        return response()->json($kabupaten);
+    }
+
+    public function getKecamatan($kabupatenID)
+    {
+        $kecamatan = Kecamatan::where('regency_id', $kabupatenID)->get();
+
+        return response()->json($kecamatan);
+    }
+
+    public function getKelurahan($kecamatanID)
+    {
+        $kelurahan = Kelurahan::where('district_id', $kecamatanID)->get();
+
+        return response()->json($kelurahan);
     }
 }

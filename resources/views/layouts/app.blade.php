@@ -61,6 +61,11 @@
                                     <i class="fa-solid fa-house"></i> Home
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('master.customer.index') }}">
+                                    <i class="fa-regular fa-user"></i> Customer
+                                </a>
+                            </li>
                             @if (auth()->user()->role == 'admin' OR auth()->user()->role == 'user')
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('product') }}">
@@ -70,7 +75,7 @@
                             @endif
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('penjualan.index') }}">
-                                    <i class="fa-solid fa-basket-shopping"></i> Sales
+                                    <i class="fa-solid fa-basket-shopping"></i> Jurnal
                                 </a>
                             </li>
                             @if (auth()->user()->role == 'admin')

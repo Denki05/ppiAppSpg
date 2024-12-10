@@ -11,7 +11,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-basket-shopping"></i> Penjualan</li>
+            <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-basket-shopping"></i> Jurnal</li>
         </ol>
     </nav>
 

@@ -9,16 +9,18 @@ class Customer extends Model
 {
     use HasFactory;
 
-    protected $table = "master_customers";
+    protected $table = "master_customer";
     protected $fillable =[
         'user_id', 
         'nama',
         'alamat', 
         'phone', 
         'owner', 
-        'kecamatan',
-        'kota', 
-        'provinsi', 
+        'provinsi_id',
+        'kabupaten_id', 
+        'kecamatan_id', 
+        'kelurahan_id', 
+        'status', 
         'created_by', 
         'updated_by', 
     ];
@@ -28,7 +30,23 @@ class Customer extends Model
     	1 => 'ACTIVE',
     ];
 
-    const ZONE = [
+    public function provinsi()
+    {
+        return $this->BelongsTo('App\Models\Master\Provinsi', 'provinsi_id', 'id');
+    }
 
-    ];
+    public function kabupaten()
+    {
+        return $this->BelongsTo('App\Models\Master\Kabupaten', 'kabupaten_id', 'id');
+    }
+
+    public function kecamatan()
+    {
+        return $this->BelongsTo('App\Models\Master\Kecamatan', 'kecamatan_id', 'id');
+    }
+
+    public function kelurahan()
+    {
+        return $this->BelongsTo('App\Models\Master\Kelurahan', 'kelurahan_id', 'id');
+    }
 }

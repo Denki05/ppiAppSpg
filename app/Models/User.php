@@ -27,9 +27,10 @@ class User extends Authenticatable
         'password',
         'role',
         'kota', 
-        'provinsi', 
-        'text_kota', 
-        'text_provinsi'
+        'provinsi_id', 
+        'kabupaten_id', 
+        'kecamatan_id',
+        'kelurahan_id'
     ];
 
     /**

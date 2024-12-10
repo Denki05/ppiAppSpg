@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserManageController;
 use App\Http\Controllers\Sales\SalesController;
+use App\Http\Controllers\Master\CustomerController;
 use App\Http\Controllers\ApiConsumerController;
 
 /*
@@ -41,13 +42,24 @@ Route::post('/admin/users', [UserManageController::class, 'store'])->name('admin
 Route::get('/admin/users/{id}/edit', [UserManageController::class, 'edit'])->name('admin.users.edit');
 Route::put('/admin/users/{id}', [UserManageController::class, 'update'])->name('admin.users.update');
 Route::delete('/admin/users/{id}', [UserManageController::class, 'destroy'])->name('admin.users.destroy');
-Route::get('/admin/users/getCities/{prov_id}', [UserManageController::class, 'getCities'])->name('admin.users.getCities');
+Route::get('/admin/users/{provinsiID}/getKabupaten', [UserManageController::class, 'getKabupaten'])->name('admin.users.getKabupaten');
+Route::get('/admin/users/{kabupatenID}/getKecamatan', [UserManageController::class, 'getKecamatan'])->name('admin.users.getKecamatan');
+Route::get('/admin/users/{kecamatanID}/getKelurahan', [UserManageController::class, 'getKelurahan'])->name('admin.users.getKelurahan');
 
 // Penjualan
 Route::get('/penjualan', [SalesController::class, 'index'])->name('penjualan.index');
 Route::get('/penjualan/create', [SalesController::class, 'create'])->name('penjualan.create');
 Route::post('/penjualan/store', [SalesController::class, 'store'])->name('penjualan.store');
 Route::delete('/penjualan/{id}', [SalesController::class, 'destroy'])->name('penjualan.destroy');
+
+// Customer
+Route::get('/master/customer', [CustomerController::class, 'index'])->name('master.customer.index');
+Route::get('/master/customer/create', [CustomerController::class, 'create'])->name('master.customer.create');
+Route::post('/master/customer/store', [CustomerController::class, 'store'])->name('master.customer.store');
+Route::get('/master/customer/show/{id}', [CustomerController::class, 'show'])->name('master.customer.show');
+Route::get('/master/customer/edit/{id}', [CustomerController::class, 'edit'])->name('master.customer.edit');
+Route::put('/master/customer/update/{id}', [CustomerController::class, 'update'])->name('master.customer.update');
+Route::delete('/master/customer/destroy/{id}', [CustomerController::class, 'destroy'])->name('master.customer.destroy');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {
