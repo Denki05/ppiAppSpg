@@ -86,7 +86,7 @@
 
         <div class="col-md-6">
             <label for="kelurahan" class="form-label">Kelurahan</label>
-            <select class="form-select select2" id="kelurahan" name="kelu<option value="">Pilih Kecamatan</option>
+            <select class="form-select select2" id="kelurahan" name="kelurahan" required>
                 <option value="">Pilih Kelurahan</option>
                 @foreach($kelurahan as $key)
                 <option value="{{ $key->id }}" {{ old('kelurahan', $user->kelurahan_id) == $key->id ? 'selected' : '' }}>{{ $key->name }}</option>

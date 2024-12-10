@@ -11,6 +11,7 @@ class SalesOrder extends Model
     protected $table = "penjualan_so";
     protected $fillable =[
         'kode', 
+        'type', 
         'tanggal_order',
         'brand', 
         'customer_id', 

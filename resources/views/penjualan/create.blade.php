@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2>#Input Penjualan</h2>
+    <h2>#Input Jurnal</h2>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -63,7 +63,7 @@ $(document).ready(function() {
             success: function(data) {
                 selectElement.empty().append('<option value="">Select Product</option>');
                 data.forEach(function(product) {
-                    selectElement.append(`<option value="${product.id}">${product.name}</option>`);
+                    selectElement.append(`<option value="${product.id}">${product.code} - ${product.name}</option>`);
                 });
             },
             error: function() {
