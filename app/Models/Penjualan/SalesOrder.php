@@ -21,7 +21,10 @@ class SalesOrder extends Model
     const STATUS = [
     	0 => 'DELETED',
     	1 => 'ACTIVE',
-    	2 => 'REVISI'
+    	2 => 'PENDING',
+    	3 => 'REVIEW',
+    	4 => 'SETTEL',
+    	5 => 'REVISI',
     ];
 
     public function status()

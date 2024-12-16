@@ -45,12 +45,14 @@
                         <td class="text-center">{{ $customer->provinsi->name }}</td>
                         <td class="text-center">
                             <a class="btn btn-primary" href="{{ route('master.customer.show', $customer->id) }}" role="button">Show</a>
+                            @if (auth()->user()->role == 'admin' OR auth()->user()->role == 'user')
                             <a class="btn btn-warning" href="{{ route('master.customer.edit', $customer->id) }}" role="button">Edit</a>
                             <form action="{{ route('master.customer.destroy', $customer->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -67,8 +69,12 @@
         $('#customerTable').DataTable({
            paging: true,
            pageLength: 5,
-           lengthMenu: [25, 50, 100],
+           lengthMenu: [5, 25, 50, 100],
            order: [[1, 'asc']],
+           responsive: true, // Enable responsiveness
+           columnDefs: [
+               { targets: [0, 5], orderable: false } // Disable sorting on # and Action columns
+           ]
        });
    });
 </script>

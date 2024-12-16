@@ -22,7 +22,6 @@
 
     <form action="{{ route('penjualan.store') }}" method="POST" class="row g-3">
         @csrf
-
         <!-- Tabs Navigation -->
         <ul class="nav nav-tabs" id="brandTabs" role="tablist">
             <li class="nav-item" role="presentation">

@@ -108,7 +108,7 @@ $(document).ready(function() {
             success: function(customers) {
                 outDomSelect.empty().append('<option value="">Pilih Kota Luar Domisili</option>');
                 customers.forEach(customer => {
-                    outDomSelect.append(`<option value="${customer.customer_id}">${customer.customer_kota} - ${customer.customer_kecamatan} - ${customer.customer_provinsi}</option>`);
+                    outDomSelect.append(`<option value="${customer.customer_id}">${customer.customer_nama} - ${customer.customer_kecamatan} - ${customer.customer_kota}</option>`);
                 });
             },
             error: function() {

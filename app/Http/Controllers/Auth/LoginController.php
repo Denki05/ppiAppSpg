@@ -39,7 +39,7 @@ class LoginController extends Controller
     {
         if ($user->role === 'spg') {
             // Redirect user role to penjualan.create route
-            return redirect()->route('penjualan.create');
+            return redirect()->route('home');
         }
 
         // Default redirect for other roles, like admin
