@@ -40,7 +40,7 @@
 
             <div class="col-md-6">
             <label for="provinsi" class="form-label">Provinsi</label>
-            <select class="form-select select2" id="provinsi" name="provinsi" required>
+            <select class="form-select select2" id="provinsi" name="provinsi" >
                 <option value="">Pilih Provinsi</option>
                 @foreach($provinsi as $key)
                 <option value="{{ $key->id }}">{{ $key->name }}</option>
@@ -50,21 +50,21 @@
 
         <div class="col-md-6">
             <label for="kota" class="form-label">Kota</label>
-            <select class="form-select select2" id="kota" name="kota" required>
+            <select class="form-select select2" id="kota" name="kota" >
                 <option value="">Pilih Kota</option>
             </select>
         </div>
 
         <div class="col-md-6">
             <label for="kecamatan" class="form-label">Kecamatan</label>
-            <select class="form-select select2" id="kecamatan" name="kecamatan" required>
+            <select class="form-select select2" id="kecamatan" name="kecamatan" >
                 <option value="">Pilih Kecamatan</option>
             </select>
         </div>
 
         <div class="col-md-6">
             <label for="kelurahan" class="form-label">Kelurahan</label>
-            <select class="form-select select2" id="kelurahan" name="kelurahan" required>
+            <select class="form-select select2" id="kelurahan" name="kelurahan" >
                 <option value="">Pilih Kelurahan</option>
             </select>
         </div>

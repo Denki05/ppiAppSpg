@@ -10,6 +10,7 @@ class SalesOrder extends Model
 {
     protected $table = "penjualan_so";
     protected $fillable =[
+        'brand_name',
         'kode', 
         'type', 
         'tanggal_order',
@@ -21,10 +22,14 @@ class SalesOrder extends Model
     const STATUS = [
     	0 => 'DELETED',
     	1 => 'ACTIVE',
-    	2 => 'PENDING',
-    	3 => 'REVIEW',
-    	4 => 'SETTEL',
-    	5 => 'REVISI',
+    	2 => 'REVIEW',
+    	3 => 'SETTEL',
+    	4 => 'REVISI',
+    ];
+
+    const TYPE = [
+    	0 => 'CUSTOMER',
+    	1 => 'CASH',
     ];
 
     public function status()
@@ -34,6 +39,10 @@ class SalesOrder extends Model
 
     public function item(){
         return $this->hasMany('App\Models\Penjualan\SalesOrderItem', 'so_id', 'id');
+    }
+
+    public function ga(){
+        return $this->hasMany('App\Models\Penjualan\SalesOrderGa', 'so_id', 'id');
     }
 
     public function createdByUser()

@@ -11966,3 +11966,16 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+
+@media (max-width: 768px) {
+  .block-title {
+      font-size: 1.2rem;
+      text-align: center;
+  }
+  .block-content {
+      padding: 10px;
+  }
+  .form-group label {
+      text-align: left !important;
+  }
+}

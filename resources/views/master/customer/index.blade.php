@@ -40,9 +40,9 @@
                     <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
                         <td class="text-center">{{ $customer->nama }}</td>
-                        <td class="text-center">{{ $customer->kecamatan->name }}</td>
-                        <td class="text-center">{{ $customer->kabupaten->name }}</td>
-                        <td class="text-center">{{ $customer->provinsi->name }}</td>
+                        <td class="text-center">{{ $customer->kecamatan->name ?? '-' }}</td>
+                        <td class="text-center">{{ $customer->kabupaten->name ?? '-' }}</td>
+                        <td class="text-center">{{ $customer->provinsi->name ?? '-' }}</td>
                         <td class="text-center">
                             <a class="btn btn-primary" href="{{ route('master.customer.show', $customer->id) }}" role="button">Show</a>
                             @if (auth()->user()->role == 'admin' OR auth()->user()->role == 'user')
