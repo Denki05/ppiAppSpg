@@ -21,8 +21,7 @@
     <div class="block-header block-header-default">
         <h2 class="block-title">Jurnal Senses</h2>
     </div>
-    <br>
-    <br>
+    <br><br>
     <div class="block-content">
         <form action="{{ route('penjualan.store') }}" method="POST" class="row g-3">
         @csrf
@@ -32,12 +31,12 @@
             <div class="form-group row" id="customerForm">
                 <label class="col-12 col-md-2 col-form-label text-right" for="contact_person">Customer :</label>
                 <div class="col-12 col-md-5 mb-2 mb-md-0">
-                    <select name="customer_dom" id="customer_dom" class="form-control select2" required style="width: 100%;">
+                    <select name="customer_dom" id="customer_dom" class="form-control select2"  style="width: 100%;">
                         <option value="">Pilih Kota Domisili</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-5">
-                    <select name="customer_non_dom" id="customer_non_dom" class="form-control select2" required style="width: 100%;">
+                    <select name="customer_non_dom" id="customer_non_dom" class="form-control select2"  style="width: 100%;">
                         <option value="">Pilih Kota Luar Domisili</option>
                     </select>
                 </div>
@@ -54,12 +53,9 @@
             
             <!-- Give Away Section -->
             <div class="form-group row">
-                <h4>Give Away :</h4>
-                <br>
+                <h4>Give Away :</h4><br>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        <i class="fa fa-plus"></i> Tambah
-                    </button>
+                    <button type="button" class="btn btn-primary row-add" id="row_add"><i class="fa fa-plus"></i> Tambah</button>
                 </div>
                 <div class="col-md-10">
                     <div class="table-responsive">
@@ -72,8 +68,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -82,8 +77,7 @@
             
             <!-- Transaksi Section -->
             <div class="form-group row">
-                <h4>Transaksi :</h4>
-                <br>
+                <h4>Transaksi :</h4><br>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-success addRow"><i class="fa fa-plus"></i> Tambah</button>
                 </div>
@@ -98,14 +92,11 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <!-- Dynamic rows will be added here -->
-                            </tbody>
+                            <tbody><!-- Dynamic rows will be added here --></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
 
             <div class="mt-4">
                 <a class="btn btn-danger" href="{{ route('home') }}" role="button">Back</a>
@@ -114,54 +105,14 @@
         </form>
     </div>
 </div>
-
-<!-- Modal GA -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add GA Variant</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="form_variant">
-          <div class="row mb-3">
-            <label for="variant_dropdown" class="col-12 col-md-3 col-form-label">Variant</label>
-            <div class="col-12 col-md-9">
-                <select id="variant_dropdown" class="form-control select2" style="width: 100%;">
-                    <option value="">Pilih Variant</option>
-                </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <label for="variant_qty" class="col-12 col-md-3 col-form-label">Qty</label>
-            <div class="col-12 col-md-9">
-              <input type="number" class="form-control" id="variant_qty" name="variant_qty" placeholder="Enter quantity">
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="add_variant">Add Variant</button>
-      </div>
-    </div>
-  </div>
-</div>
 @endsection
 
 @section('scripts')
 <script type="text/javascript">
 $(document).ready(function () {
-    // Initialize Select2 globally
+    // Initialize Select2 globally once
     $('.select2').select2({
         width: '100%',
-    });
-
-    $('#exampleModal').on('shown.bs.modal', function () {
-        $('#variant_dropdown').select2({
-            dropdownParent: $('#exampleModal'),
-        });
     });
 
     // Function to load customer data
@@ -193,6 +144,66 @@ $(document).ready(function () {
         let isChecked = $(this).is(':checked');
         $('#customerForm').toggle(!isChecked);
         $('#customer_dom, #customer_non_dom').prop('disabled', isChecked);
+    });
+
+    var product_data = [];  // Declare product_data here
+
+    // Function to load products based on brand
+    function loadProducts(brand) {
+        return $.ajax({
+            url: `/product/brand/${brand}`,  // Use the brand parameter here
+            type: "GET",
+            success: function (response) {
+                if (response.length > 0) {
+                    product_data = response;  // Store product data globally
+                } else {
+                    alert('No products found for this brand');
+                }
+            },
+            error: function (error) {
+                console.error('Failed to fetch products:', error);
+            }
+        });
+    }
+
+    // Initialize DataTable for GA section with necessary configurations
+    var gaTable = $('#datatable_ga').DataTable({
+        paging: false,       // Disable pagination
+        bInfo: false,        // Disable info (like "Showing 1 to 10 of X entries")
+        searching: false,    // Disable search box
+        ordering: false,     // Disable ordering
+        order: [[0, 'desc']]  // Ensure the table starts from the last row (counter)
+    });
+
+    // On click of "Tambah" button, add a row
+    $('#row_add').on('click', function () {
+        let brand_name = $('#brand_name').val();  // Get the brand name from the hidden input
+        loadProducts(brand_name).done(function () {  // Wait for product data to load
+            var newRow = $('#datatable_ga').DataTable().row.add([
+                '', // Counter (will be added dynamically)
+                `<select class="form-control variant_select" name="variant[]">
+                    <option value="">Pilih Variant</option>
+                    ${product_data.map(function(product) {
+                        return `<option value="${product.id}">${product.code} - ${product.name}</option>`;
+                    }).join('')}
+                </select>`,  // Dynamic variant selection dropdown
+                `<input type="number" class="form-control qty_input" name="qty[]" min="1" value="1">`,  // Qty input
+                '<button class="btn btn-danger btn-sm delete-row">Delete</button>'  // Delete button
+            ]).draw().node();
+
+            // Add counter value (row index) dynamically
+            $(newRow).find('td:first').text($('#datatable_ga').DataTable().rows().count());  // Set counter to the current row index
+
+            // Initialize select2 for the newly added variant dropdown
+            $(newRow).find('.variant_select').select2({
+                width: '100%',
+            });
+        });
+    });
+
+    // Delete row functionality
+    $(document).on('click', '.delete-row', function () {
+        $('#datatable_ga').DataTable().row($(this).closest('tr')).remove().draw();
     });
 });
 </script>

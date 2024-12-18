@@ -43,9 +43,36 @@ class SalesController extends Controller
 
     public function store(Request $request)
     {
-        
-    }
+        // Validasi data dari form
+        $validated = $request->validate([
+            // 'customer_dom' => 'required|exists:customers,id',
+            'variant' => 'required|array', // Variants harus berupa array
+            'qty' => 'required|array', // Qty harus berupa array
+            'qty.*' => 'required|numeric|min:1', // Setiap qty harus berupa angka dan lebih besar dari 0
+        ]);
 
+        // Mengambil data dari form
+        $customer_dom = $request->input('customer_dom'); // Ambil customer_dom
+        $customer_non_dom = $request->input('customer_non_dom'); // Ambil customer_non_dom
+        $variants = $request->input('variant'); // Ambil array variant[]
+        $qtys = $request->input('qty'); // Ambil array qty[]
+
+        dd($customer_non_dom);
+
+        // Looping untuk menyimpan setiap transaksi produk
+        // foreach ($variants as $index => $variant) {
+        //     $qty = $qtys[$index]; // Ambil qty yang sesuai dengan variant
+        //     // Simpan data transaksi ke database
+        //     ProductTransaction::create([
+        //         'customer_id' => $customer_dom, // Misalnya, kita simpan customer_id
+        //         'variant_id' => $variant, // ID variant yang dipilih
+        //         'qty' => $qty, // Qty yang dipilih
+        //     ]);
+        // }
+
+        // Redirect kembali dengan pesan sukses
+        return redirect()->back()->with('success', 'Data transaksi telah disimpan');
+    }
 
     public function destroy($id)
     {
