@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserManageController;
 use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Master\CustomerController;
+use App\Http\Controllers\Master\StockGaController;
 use App\Http\Controllers\ApiConsumerController;
 
 /*
@@ -63,6 +64,10 @@ Route::get('/master/customer/show/{id}', [CustomerController::class, 'show'])->n
 Route::get('/master/customer/edit/{id}', [CustomerController::class, 'edit'])->name('master.customer.edit');
 Route::put('/master/customer/update/{id}', [CustomerController::class, 'update'])->name('master.customer.update');
 Route::delete('/master/customer/destroy/{id}', [CustomerController::class, 'destroy'])->name('master.customer.destroy');
+
+// Stock GA
+Route::get('/stock_ga', [StockGaController::class, 'index'])->name('stock_ga.index');
+Route::post('/stock_ga/store', [StockGaController::class, 'store'])->name('stock_ga.store');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {
