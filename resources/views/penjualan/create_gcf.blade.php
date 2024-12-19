@@ -52,14 +52,14 @@
                 </div>
             </div>
             <hr>
-            
+
             <!-- Give Away Section -->
             <div class="form-group row">
                 <h4>Give Away :</h4><br>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-primary row-add" id="row_add"><i class="fa fa-plus"></i> Tambah</button>
+                    <button type="button" class="btn btn-primary" id="openGAModal"><i class="fa fa-plus"></i> Tambah</button>
                 </div>
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="table-responsive">
                         <table id="datatable_ga" class="table table-striped mt-3">
                             <thead>
@@ -75,7 +75,7 @@
                 </div>
             </div>
             <hr>
-            
+
             <!-- Transaksi Section -->
             <div class="form-group row">
                 <h4>Transaksi :</h4><br>
@@ -105,12 +105,43 @@
         </form>
     </div>
 </div>
+
+<!-- Modal for adding Give Away item -->
+<div class="modal fade" id="gaModal" tabindex="-1" aria-labelledby="gaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gaModalLabel">Tambah Item Give Away</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="gaForm">
+                    <div class="mb-3">
+                        <label for="variantSelect" class="form-label">Variant</label>
+                        <select class="form-control select2" id="variantSelect" name="variant">
+                            <option value="">Pilih Variant</option>
+                            <!-- Variant options will be populated via JavaScript -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="qtyInput" class="form-label">Qty</label>
+                        <input type="number" class="form-control" id="qtyInput" name="qty" min="1" placeholder="Masukkan Qty">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="saveGA">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
 <script type="text/javascript">
 $(document).ready(function () {
-    // Initialize Select2 globally once
     $('.select2').select2({
         width: '100%',
     });
@@ -165,7 +196,6 @@ $(document).ready(function () {
     let brand_name = $('#brand_name').val();
     preloadProducts(brand_name);
 
-    // Initialize DataTable for GA section
     var gaTable = $('#datatable_ga').DataTable({
         paging: false,
         bInfo: false,
@@ -174,36 +204,72 @@ $(document).ready(function () {
         order: [[0, 'desc']],
     });
 
-    // Handle row_add button for GA section
-    $('#row_add').on('click', function () {
-        if (product_data.length === 0) {
+    // Hide the table initially if there is no data
+    const updateTableVisibility = () => {
+        if (gaTable.rows().count() === 0) {
+            $('#datatable_ga').closest('.table-responsive').hide();
+        } else {
+            $('#datatable_ga').closest('.table-responsive').show();
+        }
+    };
+
+    // Initial table visibility check
+    updateTableVisibility();
+
+    // Open modal to add a new give away item
+    $('#openGAModal').on('click', function () {
+        $('#gaModal').modal('show');
+
+        // Populate variant options in the modal if product data is available
+        if (product_data.length > 0) {
+            const variantSelect = $('#variantSelect');
+            variantSelect.empty().append('<option value="">Pilih Variant</option>');
+            product_data.forEach(product => {
+                variantSelect.append(`<option value="${product.id}">${product.code} - ${product.name}</option>`);
+            });
+
+            // Initialize Select2 for variant dropdown in modal
+            variantSelect.select2({
+                dropdownParent: $('#gaModal'), // Ensure dropdown is inside the modal
+                width: '100%',
+            });
+        } else {
             alert('Data produk belum tersedia. Harap tunggu sebentar.');
+        }
+    });
+
+    // Save give away item to the table
+    $('#saveGA').on('click', function () {
+        const variant = $('#variantSelect').val();
+        const variantText = $('#variantSelect option:selected').text();
+        const qty = $('#qtyInput').val();
+
+        if (!variant || !qty) {
+            alert('Harap isi semua data sebelum menyimpan.');
             return;
         }
 
-        var newRow = gaTable.row.add([
-            `<select class="form-control variant_select" name="variant[]">
-                <option value="">Pilih Variant</option>
-                ${product_data.map(function (product) {
-                    return `<option value="${product.id}">${product.code} - ${product.name}</option>`;
-                }).join('')}
-            </select>`,
-            `<input type="number" class="form-control qty_input" name="qty[]" min="1" value="500">`,
-            '<button class="btn btn-danger btn-sm delete-row"><i class="fa-solid fa-trash"></i></button>'
-        ]).draw().node();
+        // Add new row to DataTable
+        gaTable.row.add([
+            `<input type="hidden" name="variant[]" value="${variant}">${variantText}`,
+            `<input type="hidden" name="qty[]" value="${qty}">${qty}`,
+            '<button class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>',
+        ]).draw();
 
-        // Add counter value (row index) dynamically
-        // $(newRow).find('td:first').text(gaTable.rows().count());
+        // Update table visibility
+        updateTableVisibility();
 
-        // Initialize select2 for the newly added variant dropdown
-        $(newRow).find('.variant_select').select2({
-            width: '100%',
-        });
+        // Reset the modal form and close the modal
+        $('#gaForm')[0].reset();
+        $('#gaModal').modal('hide');
     });
 
-    // Delete row functionality for GA table
+    // Delete row functionality
     $(document).on('click', '.delete-row', function () {
         gaTable.row($(this).closest('tr')).remove().draw();
+
+        // Update table visibility after row deletion
+        updateTableVisibility();
     });
 
     // Initialize DataTable for Transaksi section
@@ -212,7 +278,6 @@ $(document).ready(function () {
         bInfo: false,
         searching: false,
         ordering: false,
-        order: [[0, 'desc']],
     });
 
     // Handle addRow button for Transaksi section

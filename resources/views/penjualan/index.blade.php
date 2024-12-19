@@ -52,7 +52,11 @@
                             <td class="text-center">{{ $sale->tanggal_order }}</td>
                             <td class="text-center">{{ $sale->brand_name }}</td>
                             <td class="text-center">
-                                {{ $sale->customer->nama }}, {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
+                                @if($sale->type == 0)
+                                    {{ $sale->customer->nama }}, {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
+                                @else
+                                    CASH
+                                @endif
                             </td>
                             <td class="text-center">
                                 <a class="btn btn-info" href="" role="button">

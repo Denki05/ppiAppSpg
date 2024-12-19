@@ -148,6 +148,14 @@ class SalesController extends Controller
             $sales->deleted_at = now();
             $sales->save();
 
+            // Soft delete related sales GA records
+            $sales_ga = SalesOrderGa::where('so_id', $sales->id);
+            $sales_ga->update(['deleted_at' => now()]);
+
+            // Soft delete related sales items
+            $sales_item = SalesOrderItem::where('so_id', $sales->id);
+            $sales_item->update(['deleted_at' => now()]);
+
             // Redirect back with success message
             return redirect()->route('penjualan.index')->with('success', 'Jurnal berhasil di hapus.');
 
