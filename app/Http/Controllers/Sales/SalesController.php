@@ -145,6 +145,7 @@ class SalesController extends Controller
             // Delete the sales order
             $sales->status = 0 ;
             $sales->updated_by = Auth::user()->id;
+            $sales->deleted_at = now();
             $sales->save();
 
             // Redirect back with success message

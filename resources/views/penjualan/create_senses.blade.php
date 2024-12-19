@@ -24,7 +24,6 @@
     <div class="block-header block-header-default">
         <h2 class="block-title">Jurnal Senses</h2>
     </div>
-    <br><br>
     <div class="block-content">
         <form action="{{ route('penjualan.store') }}" method="POST" class="row g-3">
         @csrf
@@ -60,7 +59,7 @@
                 <div class="col-md-2">
                     <button type="button" class="btn btn-primary row-add" id="row_add"><i class="fa fa-plus"></i> Tambah</button>
                 </div>
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="table-responsive">
                         <table id="datatable_ga" class="table table-striped mt-3">
                             <thead>
@@ -190,7 +189,7 @@ $(document).ready(function () {
                 }).join('')}
             </select>`,
             `<input type="number" class="form-control qty_input" name="qty[]" min="1" value="500">`,
-            '<button class="btn btn-danger btn-sm delete-row">Delete</button>'
+            '<button class="btn btn-danger btn-sm delete-row"><i class="fa-solid fa-trash"></i></button>'
         ]).draw().node();
 
         // Add counter value (row index) dynamically
@@ -230,7 +229,7 @@ $(document).ready(function () {
                 }).join('')}
             </select>`,
             `<input type="number" class="form-control qty_input" name="transaksi_qty[]" min="1" value="500">`,
-            '<button class="btn btn-danger btn-sm delete-row">Delete</button>'
+            '<button class="btn btn-danger btn-sm delete-row"><i class="fa-solid fa-trash"></i></button>'
         ]).draw().node();
 
         // Add counter value (row index) dynamically
