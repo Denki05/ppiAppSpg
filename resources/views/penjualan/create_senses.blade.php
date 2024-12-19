@@ -65,10 +65,9 @@
                         <table id="datatable_ga" class="table table-striped mt-3">
                             <thead>
                                 <tr>
-                                    <th>#</th>
                                     <th style="min-width: 150px;">Variant</th>
-                                    <th style="min-width: 70px;">Qty</th>
-                                    <th style="min-width: 50px;">Action</th>
+                                    <th style="min-width: 60px;">Qty</th>
+                                    <th style="min-width: 40px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -89,10 +88,9 @@
                         <table id="datatable_transaksi" class="table table-striped mt-3">
                             <thead>
                                 <tr>
-                                    <th>#</th>
                                     <th style="min-width: 150px;">Variant</th>
-                                    <th style="min-width: 70px;">Qty</th>
-                                    <th style="min-width: 50px;">Action</th>
+                                    <th style="min-width: 60px;">Qty</th>
+                                    <th style="min-width: 40px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody><!-- Dynamic rows will be added here --></tbody>
@@ -116,6 +114,36 @@ $(document).ready(function () {
     // Initialize Select2 globally once
     $('.select2').select2({
         width: '100%',
+    });
+
+    function loadCustomerData(type) {
+        let url = type === 'DOM' ? "{{ route('penjualan.checkCustomerDOM') }}" : "{{ route('penjualan.checkCustomerOUTDOM') }}";
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                let selectElement = type === 'DOM' ? $('#customer_dom') : $('#customer_non_dom');
+                selectElement.empty().append(`<option value="">Pilih Kota ${type === 'DOM' ? 'Domisili' : 'Luar Domisili'}</option>`);
+                data.forEach(function (customer) {
+                    selectElement.append(`<option value="${customer.customer_id}">${customer.customer_nama} - ${customer.customer_kota}, ${customer.customer_provinsi}</option>`);
+                });
+            },
+            error: function (xhr) {
+                console.error(`Failed to fetch customer ${type} data`, xhr);
+            }
+        });
+    }
+
+    // Load customer data on page load
+    loadCustomerData('DOM');
+    loadCustomerData('OUTDOM');
+
+    // Checkbox visibility handling
+    $('#customerCash').on('change', function () {
+        let isChecked = $(this).is(':checked');
+        $('#customerForm').toggle(!isChecked); // Show/hide customer dropdowns
+        $('#customer_dom, #customer_non_dom').prop('disabled', isChecked); // Disable if checked
     });
 
     var product_data = []; // Declare product_data globally
@@ -155,7 +183,6 @@ $(document).ready(function () {
         }
 
         var newRow = gaTable.row.add([
-            '', // Counter
             `<select class="form-control variant_select" name="variant[]">
                 <option value="">Pilih Variant</option>
                 ${product_data.map(function (product) {
@@ -167,7 +194,7 @@ $(document).ready(function () {
         ]).draw().node();
 
         // Add counter value (row index) dynamically
-        $(newRow).find('td:first').text(gaTable.rows().count());
+        // $(newRow).find('td:first').text(gaTable.rows().count());
 
         // Initialize select2 for the newly added variant dropdown
         $(newRow).find('.variant_select').select2({
@@ -186,7 +213,6 @@ $(document).ready(function () {
         bInfo: false,
         searching: false,
         ordering: false,
-        order: [[0, 'desc']],
     });
 
     // Handle addRow button for Transaksi section
@@ -197,7 +223,6 @@ $(document).ready(function () {
         }
 
         var newRow = transaksiTable.row.add([
-            '', // Counter
             `<select class="form-control transaksi_select" name="transaksi[]">
                 <option value="">Pilih Variant</option>
                 ${product_data.map(function (product) {
@@ -209,7 +234,7 @@ $(document).ready(function () {
         ]).draw().node();
 
         // Add counter value (row index) dynamically
-        $(newRow).find('td:first').text(transaksiTable.rows().count());
+        // $(newRow).find('td:first').text(transaksiTable.rows().count());
 
         // Initialize select2 for the newly added variant dropdown
         $(newRow).find('.transaksi_select').select2({
