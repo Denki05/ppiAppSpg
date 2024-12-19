@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 @if ($errors->any())
     <div class="alert alert-danger">
         <ul>
@@ -8,12 +9,14 @@
                 <li>{{ $error }}</li>
             @endforeach
         </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if(session('success'))
-    <div class="alert alert-success">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
@@ -142,8 +145,8 @@ $(document).ready(function () {
     // Checkbox visibility handling
     $('#customerCash').on('change', function () {
         let isChecked = $(this).is(':checked');
-        $('#customerForm').toggle(!isChecked);
-        $('#customer_dom, #customer_non_dom').prop('disabled', isChecked);
+        $('#customerForm').toggle(!isChecked); // Show/hide customer dropdowns
+        $('#customer_dom, #customer_non_dom').prop('disabled', isChecked); // Disable if checked
     });
 
     var product_data = [];  // Declare product_data here
@@ -187,7 +190,7 @@ $(document).ready(function () {
                         return `<option value="${product.id}">${product.code} - ${product.name}</option>`;
                     }).join('')}
                 </select>`,  // Dynamic variant selection dropdown
-                `<input type="number" class="form-control qty_input" name="qty[]" min="1" value="1">`,  // Qty input
+                `<input type="number" class="form-control qty_input" name="qty[]" min="1" value="500">`,  // Qty input
                 '<button class="btn btn-danger btn-sm delete-row">Delete</button>'  // Delete button
             ]).draw().node();
 
@@ -204,6 +207,61 @@ $(document).ready(function () {
     // Delete row functionality
     $(document).on('click', '.delete-row', function () {
         $('#datatable_ga').DataTable().row($(this).closest('tr')).remove().draw();
+    });
+
+    // Transaksi Item
+    var transaksiTable = $('#datatable_transaksi').DataTable({
+        paging: false,       // Disable pagination
+        bInfo: false,        // Disable info
+        searching: false,    // Disable search box
+        ordering: false,     // Disable column ordering
+        order: [[0, 'desc']] // Ensure the table starts from the last row (counter)
+    });
+
+    function loadProductsForTransaksi(brand) {
+        return $.ajax({
+            url: `/product/brand/${brand}`,
+            type: "GET",
+            success: function (response) {
+                if (response.length > 0) {
+                    product_data = response; // Store product data globally
+                } else {
+                    alert('No products found for this brand');
+                }
+            },
+            error: function (error) {
+                console.error('Failed to fetch products:', error);
+            }
+        });
+    }
+
+    $('.addRow').on('click', function () {
+        let brand_name = $('#brand_name').val(); // Get the brand name from the hidden input
+        loadProductsForTransaksi(brand_name).done(function () {
+            var newRow = transaksiTable.row.add([
+                '', // Counter (will be added dynamically)
+                `<select class="form-control transaksi_select" name="transaksi[]">
+                    <option value="">Pilih Variant</option>
+                    ${product_data.map(function (product) {
+                        return `<option value="${product.id}">${product.code} - ${product.name}</option>`;
+                    }).join('')}
+                </select>`, // Dynamic dropdown for variants
+                `<input type="number" class="form-control qty_input" name="transaksi_qty[]" min="1" value="500">`, // Qty input
+                '<button class="btn btn-danger btn-sm delete-row">Delete</button>' // Delete button
+            ]).draw().node();
+
+            // Add counter value (row index) dynamically
+            $(newRow).find('td:first').text(transaksiTable.rows().count()); // Set counter to the current row index
+
+            // Initialize select2 for the newly added dropdown
+            $(newRow).find('.transaksi_select').select2({
+                width: '100%',
+            });
+        });
+    });
+
+    $(document).on('click', '.delete-row', function () {
+        transaksiTable.row($(this).closest('tr')).remove().draw();
     });
 });
 </script>

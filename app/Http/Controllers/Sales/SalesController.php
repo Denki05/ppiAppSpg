@@ -43,35 +43,84 @@ class SalesController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi data dari form
+        // Validate form input
         $validated = $request->validate([
-            // 'customer_dom' => 'required|exists:customers,id',
-            'variant' => 'required|array', // Variants harus berupa array
-            'qty' => 'required|array', // Qty harus berupa array
-            'qty.*' => 'required|numeric|min:1', // Setiap qty harus berupa angka dan lebih besar dari 0
+            'customer_dom' => 'nullable|exists:master_customer,id',
+            'customer_non_dom' => 'nullable|exists:master_customer,id',
+            'customerCash' => 'nullable|numeric|min:0',
+            'brand_name' => 'required|string',
+            'variant' => 'required|array',
+            'qty' => 'required|array',
+            'qty.*' => 'required|numeric|min:1',
+            'transaksi' => 'required|array',
+            'transaksi_qty' => 'required|array',
+            'transaksi_qty.*' => 'required|numeric|min:1',
         ]);
 
-        // Mengambil data dari form
-        $customer_dom = $request->input('customer_dom'); // Ambil customer_dom
-        $customer_non_dom = $request->input('customer_non_dom'); // Ambil customer_non_dom
-        $variants = $request->input('variant'); // Ambil array variant[]
-        $qtys = $request->input('qty'); // Ambil array qty[]
+        // Start database transaction
+        DB::beginTransaction();
 
-        dd($customer_non_dom);
+        try {
+            // Determine customer type and value
+            $customer_id = null;
+            $customer_type = 0;
 
-        // Looping untuk menyimpan setiap transaksi produk
-        // foreach ($variants as $index => $variant) {
-        //     $qty = $qtys[$index]; // Ambil qty yang sesuai dengan variant
-        //     // Simpan data transaksi ke database
-        //     ProductTransaction::create([
-        //         'customer_id' => $customer_dom, // Misalnya, kita simpan customer_id
-        //         'variant_id' => $variant, // ID variant yang dipilih
-        //         'qty' => $qty, // Qty yang dipilih
-        //     ]);
-        // }
+            if (!empty($request->customer_dom) || !empty($request->customer_non_dom)) {
+                $customer_id = $request->customer_dom ?? $request->customer_non_dom;
+            } elseif (!empty($request->customerCash)) {
+                $customer_id = $request->customerCash;
+                $customer_type = 1;
+            } else {
+                return redirect()->back()->withErrors(['error' => 'You must select a customer or provide cash value.']);
+            }
 
-        // Redirect kembali dengan pesan sukses
-        return redirect()->back()->with('success', 'Data transaksi telah disimpan');
+            // Input penjualan index
+            $penjualan = new SalesOrder;
+            $penjualan->kode = SalesOrder::generateSO();
+            $penjualan->customer_id = $customer_id;
+            $penjualan->type = $customer_type;
+            $penjualan->brand_name = $request->brand_name;
+            $penjualan->tanggal_order = date('Y-m-d');
+            $penjualan->status = 2;
+            $penjualan->save();
+
+            // Input penjualan GA
+            foreach ($request->variant as $index => $variant) {
+                SalesOrderGa::create([
+                    'so_id' => $penjualan->id,
+                    'product_packaging_id' => $variant,
+                    'qty' => $request->qty[$index],
+                ]);
+            }
+
+            // Input penjualan item
+            foreach ($request->transaksi as $index => $transaksi) {
+                SalesOrderItem::create([
+                    'so_id' => $penjualan->id,
+                    'product_id' => $transaksi,
+                    'qty' => $request->transaksi_qty[$index],
+                    'unit_weight' => 1,
+                ]);
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect with success message
+            return redirect()->back()->with('success', 'Data transaksi telah disimpan.');
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of error
+            DB::rollback();
+
+            // Log the error (optional)
+            \Log::error('Failed to store transaction', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Redirect with error message
+            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()]);
+        }
     }
 
     public function destroy($id)
