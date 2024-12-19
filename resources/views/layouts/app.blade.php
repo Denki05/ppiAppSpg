@@ -72,23 +72,33 @@
                                 </a>
                             </li>
                             @if (auth()->user()->role == 'admin' OR auth()->user()->role == 'user')
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('product') }}">
-                                    <i class="fa-solid fa-list"></i> Product
+                            <li class="nav-item dropdown">
+                                <a id="adminDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-brands fa-product-hunt" aria-hidden="true"></i> Product
                                 </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('product') }}">
+                                            <i class="fa fa-users" aria-hidden="true"></i> List
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('stock_ga.index') }}">
+                                            <i class="fa-solid fa-boxes-packing" aria-hidden="true"></i> Stock
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                             @endif
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-basket-shopping"></i> Jurnal
+                                    <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Jurnal
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                                     <li>
                                         <a class="dropdown-item" href="{{ route('penjualan.create_senses') }}">
-                                            <i class="fa fa-users" aria-hidden="true"></i> Senses
+                                            <i class="fa-solid fa-shop" aria-hidden="true"></i> Senses
                                         </a>
                                         <a class="dropdown-item" href="{{ route('penjualan.create_gcf') }}">
-                                            <i class="fa fa-users" aria-hidden="true"></i> GCF
+                                            <i class="fa-solid fa-shop" aria-hidden="true"></i> GCF
                                         </a>
                                     </li>
                                 </ul>

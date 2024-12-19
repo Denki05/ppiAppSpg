@@ -60,7 +60,7 @@ class CustomerController extends Controller
         ]);
 
         // Redirect back with a success message
-        return redirect()->route('master.customer.index')->with('success', 'User created successfully.');
+        return redirect()->route('master.customer.index')->with('success', 'Customer created successfully.');
     }
 
     public function show($id)

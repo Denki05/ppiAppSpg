@@ -95,6 +95,7 @@ class SalesController extends Controller
             $penjualan->brand_name = $request->brand_name;
             $penjualan->tanggal_order = date('Y-m-d');
             $penjualan->status = 2;
+            $penjualan->created_by = Auth::id();
             $penjualan->save();
 
             // Input penjualan GA
