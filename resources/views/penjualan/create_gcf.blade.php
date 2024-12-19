@@ -22,7 +22,7 @@
 
 <div class="block">
     <div class="block-header block-header-default">
-        <h2 class="block-title">Jurnal Senses</h2>
+        <h2 class="block-title">Jurnal GCF</h2>
     </div>
     <br><br>
     <div class="block-content">
