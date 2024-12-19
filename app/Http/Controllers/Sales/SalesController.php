@@ -12,6 +12,7 @@ use App\Models\Master\Customer;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -147,11 +148,11 @@ class SalesController extends Controller
             $sales->save();
 
             // Redirect back with success message
-            return redirect()->route('penjualan.index')->with('success', 'Sales order deleted successfully.');
+            return redirect()->route('penjualan.index')->with('success', 'Jurnal berhasil di hapus.');
 
         } catch (\Exception $e) {
             // Handle the error and redirect back with error message
-            return redirect()->route('penjualan.index')->with('error', 'Failed to delete sales order.');
+            return redirect()->route('penjualan.index')->with('error', 'Gagal menghapus Jurnal.');
         }
     }
 
@@ -180,26 +181,39 @@ class SalesController extends Controller
     }
 
     public function checkCustomerOUTDOM()
-{
-    // Get the authenticated user
-    $user = User::find(Auth::id());
+    {
+        // Get the authenticated user
+        $user = User::find(Auth::id());
 
-    // Fetch customers from a different province or regency
-    $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
-        ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-        ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-        // ->where('master_customer.provinsi_id', '!=', $user->provinsi_id)
-        ->Where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
-        ->select(
-            'master_customer.id as customer_id',
-            'master_customer.nama as customer_nama',
-            'districts.name as customer_kecamatan',
-            'regencies.name as customer_kota',
-            'provinces.name as customer_provinsi'
-        )
-        ->get();
+        // Fetch customers from a different province or regency
+        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
+            ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
+            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
+            // ->where('master_customer.provinsi_id', '!=', $user->provinsi_id)
+            ->Where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+            ->select(
+                'master_customer.id as customer_id',
+                'master_customer.nama as customer_nama',
+                'districts.name as customer_kecamatan',
+                'regencies.name as customer_kota',
+                'provinces.name as customer_provinsi'
+            )
+            ->get();
 
-    // Return customers as JSON
-    return response()->json($customers);
-}
+        // Return customers as JSON
+        return response()->json($customers);
+    }
+
+    public function review()
+    {
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+
+        // Filter data untuk bulan dan tahun saat ini
+        $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
+                                ->whereYear('tanggal_order', $currentYear)
+                                ->get();
+
+        return view('penjualan.index', $data);
+    }
 }

@@ -11,16 +11,12 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-basket-shopping"></i> Jurnal</li>
+            <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-eye"></i> Review - Settel</li>
         </ol>
     </nav>
 
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <a class="btn btn-success" href="{{ route('penjualan.create') }}" role="button">
-                <i class="fa fa-plus" aria-hidden="true"></i> Create
-            </a>
-
             <br>
             <br>
 
@@ -29,34 +25,32 @@
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center">Kode</th>
-                        <th class="text-center">Customer</th>
                         <th class="text-center">Tanggal</th>
+                        <th class="text-center">Brand</th>
+                        <th class="text-center">Customer</th>
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($sales as $sale)
-                        @if($sale->status == 1)
+                        @if(in_array($sale->status, ['1', '2', '3']))
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td class="text-center">{{ $sale->kode }}</td>
-                            <td class="text-center">{{ $sale->nama_customer }}</td>
                             <td class="text-center">{{ $sale->tanggal_order }}</td>
+                            <td class="text-center">{{ $sale->brand_name }}</td>
+                            <td class="text-center">
+                                {{ $sale->customer->nama }}, {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
+                            </td>
                             <td class="text-center">
                                 <a class="btn btn-info" href="" role="button">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </a>
-                                <!-- <a class="btn btn-warning" href="" role="button">
-                                    <i class="fa fa-pencil" aria-hidden="true"></i>
-                                </a> -->
-                                <form action="{{ route('penjualan.destroy', $sale->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                <form action="{{ route('penjualan.destroy', $sale->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah kamu yakin menghapus jurnal ini?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
                                 </form>
-                                <!-- <a class="btn btn-primary" href="" role="button">
-                                    <i class="fa fa-print" aria-hidden="true"></i>
-                                </a> -->
                             </td>
                         </tr>
                         @endif
@@ -76,6 +70,7 @@
            pageLength: 5,          // Number of records per page
            lengthMenu: [25, 50, 100], // Dropdown menu options for page length
            responsive: true, // Enable responsiveness
+           order: [[2, 'desc']]  // Ensure the table starts from the last row (counter)
        });
    });
 </script>

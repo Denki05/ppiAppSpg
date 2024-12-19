@@ -49,4 +49,8 @@ class Customer extends Model
     {
         return $this->BelongsTo('App\Models\Master\Kelurahan', 'kelurahan_id', 'id');
     }
+
+    public function so(){
+        return $this->hasMany('App\Models\Penjualan\SalesOrder', 'customer_id', 'id');
+    }
 }

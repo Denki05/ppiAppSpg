@@ -37,6 +37,11 @@ class SalesOrder extends Model
         return array_search($this->status, self::STATUS);
     }
 
+    public function customer()
+    {
+        return $this->BelongsTo('App\Models\Master\Customer', 'customer_id', 'id');
+    }
+
     public function item(){
         return $this->hasMany('App\Models\Penjualan\SalesOrderItem', 'so_id', 'id');
     }
