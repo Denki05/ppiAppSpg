@@ -29,7 +29,7 @@ class SalesController extends Controller
         return view('penjualan.index', $data);
     }
 
-    public function create(Request $request)
+    public function create_senses(Request $request)
     {
         // Fetch product data from ApiConsumerController
         $apiConsumer = new ApiConsumerController();
@@ -38,7 +38,19 @@ class SalesController extends Controller
         $data['customer'] = Customer::get();
 
         // Pass the product and unit weight data to the view
-        return view('penjualan.create', $data);
+        return view('penjualan.create_senses', $data);
+    }
+
+    public function create_gcf(Request $request)
+    {
+        // Fetch product data from ApiConsumerController
+        $apiConsumer = new ApiConsumerController();
+        $data['products'] = $apiConsumer->getItemsProducts();
+        $data['brands'] = $apiConsumer->getItemsBrands();
+        $data['customer'] = Customer::get();
+
+        // Pass the product and unit weight data to the view
+        return view('penjualan.create_gcf', $data);
     }
 
     public function store(Request $request)

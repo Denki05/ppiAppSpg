@@ -78,10 +78,20 @@
                                 </a>
                             </li>
                             @endif
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('penjualan.create') }}">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-solid fa-basket-shopping"></i> Jurnal
                                 </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('penjualan.create_senses') }}">
+                                            <i class="fa fa-users" aria-hidden="true"></i> Senses
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('penjualan.create_gcf') }}">
+                                            <i class="fa fa-users" aria-hidden="true"></i> GCF
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="">
