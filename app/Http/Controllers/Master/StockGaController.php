@@ -52,11 +52,18 @@ class StockGaController extends Controller
             ], 400);
         }
 
+        // calculated pcs if input qty
+        $default_ml_pcs = 45;
+        $get_pcs = $request->qty / $default_ml_pcs;
+
+        // dd($get_pcs);
+
         // Save the data to the database
         $stock = new StockGa();
         $stock->product_id = $request->variant;
         $stock->brand_name = $request->brand;
         $stock->qty = $request->qty;
+        $stock->pcs = $get_pcs;
         $stock->created_by = Auth::id();
         $stock->save();
 
@@ -68,5 +75,39 @@ class StockGaController extends Controller
         ]);
     }
 
-    
+    public function addStock(Request $request, $id)
+    {
+        // Check if the stock entry exists
+        $stock = StockGa::find($id);
+
+        if (!$stock) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Stock entry not found.',
+            ], 404);
+        }
+
+        // Validate the request
+        $request->validate([
+            'additional_stock' => 'required|numeric|min:1',
+        ]);
+
+        // Add the additional stock
+        $stock->qty += $request->additional_stock;
+
+        // Calculate total pieces and cartons
+        $totalPieces = $stock->qty;
+        $cartons = intdiv($totalPieces, 45); // Calculate full cartons
+        $remainingPieces = $totalPieces / 45; // Calculate leftover pieces
+        // dd($remainingPieces);
+
+        // Update the stock record
+        $stock->pcs = $remainingPieces; // Store the remaining pieces
+        $stock->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Stock berhasil di tambahkan!.",
+        ]);
+    }
 }

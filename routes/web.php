@@ -68,6 +68,7 @@ Route::delete('/master/customer/destroy/{id}', [CustomerController::class, 'dest
 // Stock GA
 Route::get('/stock_ga', [StockGaController::class, 'index'])->name('stock_ga.index');
 Route::post('/stock_ga/store', [StockGaController::class, 'store'])->name('stock_ga.store');
+Route::patch('/stock_ga/addStock/{id}', [StockGaController::class, 'addStock'])->name('stock_ga.addStock');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {

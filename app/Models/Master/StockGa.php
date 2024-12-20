@@ -14,6 +14,7 @@ class StockGa extends Model
         'product_id', 
         'brand_name', 
         'qty',
+        'pcs',
         'created_by',
         'updated_by',
     ];

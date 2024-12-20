@@ -25,18 +25,38 @@
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center">Variant</th>
+                        <th class="text-center">Pcs / Botol</th>
                         <th class="text-center">Stock</th>
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($stocks as $stock)
-                    <tr>
-                        <td class="text-center">{{ $loop->iteration }}</td>
-                        <td class="text-center">{{ $stock->product_id }}</td>
-                        <td class="text-center">{{ $stock->qty }}</td>
-                        <td class="text-center"></td>
-                    </tr>
+                    @foreach($stocks as $index => $stock)
+                        @php
+                            // Find the product details by matching product_id
+                            $product = collect($products)->firstWhere('id', $stock->product_id);
+                        @endphp
+                        <tr>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">
+                                @if($product)
+                                    {{ $product['code'] }} - {{ $product['name'] }}
+                                @else
+                                    <em>Unknown Product</em>
+                                @endif
+                            </td>
+                            <td class="text-center">{{ $stock->pcs }}</td>
+                            <td class="text-center">{{ $stock->qty }} (ML)</td>
+                            <td class="text-center">
+                                @if($stock->id)
+                                    <button class="btn btn-success btn-sm" onclick="addStock({{ $stock->id }})">
+                                        <i class="fa fa-plus"></i> Add Stock
+                                    </button>
+                                @else
+                                    <em>No ID available</em>
+                                @endif
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -44,6 +64,7 @@
     </div>
 </div>
 
+<!-- input stok awal -->
 <div class="modal fade" id="gaModal" tabindex="-1" aria-labelledby="gaModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -80,10 +101,46 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for Adding Stock -->
+<div class="modal fade" id="addStockModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStockModalLabel">Tambah Stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStockForm">
+                    <div class="mb-3">
+                        <label for="additionalQty" class="form-label">Jumlah Tambahan</label>
+                        <input type="number" class="form-control" id="additionalQty" name="additional_stock" min="1" placeholder="Enter additional quantity" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="saveStock">Add Stock</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
 <script>
+    let stockIdToUpdate = null; // Store the ID of the stock to update
+
+    function addStock(stockId) {
+        console.log('Stock ID:', stockId); // Debug stock ID
+        stockIdToUpdate = stockId;
+        if (!stockId) {
+            alert('Invalid stock ID.');
+            return;
+        }
+        $('#addStockModal').modal('show'); // Show the modal
+    }
+
     $(document).ready(function () {
         $('#brandSelect').select2({
             width: '100%',
@@ -162,6 +219,43 @@
                         alert('An error occurred. Please try again.'); // Fallback error message
                     }
                 }
+            });
+        });
+
+        $('#saveStock').on('click', function () {
+            if (!stockIdToUpdate) {
+                alert('No stock selected for updating.');
+                return;
+            }
+
+            const additionalStock = $('#additionalQty').val();
+
+            if (!additionalStock || isNaN(additionalStock) || additionalStock <= 0) {
+                alert('Please enter a valid quantity.');
+                return;
+            }
+
+            $.ajax({
+                url: `/stock_ga/addStock/${stockIdToUpdate}`,
+                type: 'PATCH',
+                data: {
+                    additional_stock: additionalStock,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function (response) {
+                    alert(response.message);
+                    $('#addStockModal').modal('hide'); // Hide the modal
+                    location.reload(); // Reload the page to reflect updated stock
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        alert(xhr.responseJSON.message);
+                    } else {
+                        alert('Failed to update stock. Please try again.');
+                    }
+                },
             });
         });
     });
