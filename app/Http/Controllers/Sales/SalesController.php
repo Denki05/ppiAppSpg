@@ -9,6 +9,7 @@ use App\Models\Penjualan\SalesOrder;
 use App\Models\Penjualan\SalesOrderItem;
 use App\Models\Penjualan\SalesOrderGa;
 use App\Models\Master\Customer;
+use App\Models\Master\StockGa;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -75,15 +76,10 @@ class SalesController extends Controller
 
         try {
             // Determine customer type and value
-            $customer_id = null;
-            $customer_type = 0;
+            $customer_id = $request->customer_dom ?? $request->customer_non_dom ?? null;
+            $customer_type = !empty($request->customerCash) ? 1 : 0;
 
-            if (!empty($request->customer_dom) || !empty($request->customer_non_dom)) {
-                $customer_id = $request->customer_dom ?? $request->customer_non_dom;
-            } elseif (!empty($request->customerCash)) {
-                $customer_id = $request->customerCash;
-                $customer_type = 1;
-            } else {
+            if (!$customer_id && $customer_type === 0) {
                 return redirect()->back()->withErrors(['error' => 'You must select a customer or provide cash value.']);
             }
 
@@ -100,11 +96,22 @@ class SalesController extends Controller
 
             // Input penjualan GA
             foreach ($request->variant as $index => $variant) {
+                $stock = StockGa::find($variant);
+
+                if (!$stock || $stock->qty < $request->qty[$index]) {
+                    DB::rollback();
+                    return redirect()->back()->withErrors(['error' => 'Stock variant Give Away: ' . $variant . ' tidak mencukupi!']);
+                }
+
                 SalesOrderGa::create([
                     'so_id' => $penjualan->id,
                     'product_packaging_id' => $variant,
                     'qty' => $request->qty[$index],
                 ]);
+
+                // Reduce stock
+                $stock->qty -= $request->qty[$index];
+                $stock->save();
             }
 
             // Input penjualan item
