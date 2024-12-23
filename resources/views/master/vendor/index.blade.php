@@ -11,24 +11,24 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"> Customer</li>
+            <li class="breadcrumb-item active" aria-current="page"> Vendor</li>
         </ol>
     </nav>
 
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <a class="btn btn-success" href="{{ route('master.customer.create') }}" role="button">
+            <a class="btn btn-success" href="{{ route('master.vendor.create') }}" role="button">
                 <i class="fa fa-plus" aria-hidden="true"></i> Create
             </a>
 
             <br>
             <br>
 
-            <table id="customerTable" class="table table-striped">
+            <table id="vendorTable" class="table table-striped">
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
-                        <th class="text-center">Customer</th>
+                        <th class="text-center">Vendor</th>
                         <th class="text-center">Kecamatan</th>
                         <th class="text-center">Kota</th>
                         <th class="text-center">Provinsi</th>
@@ -36,18 +36,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                @foreach($customers as $customer)
+                    @foreach($vendors as $vendor)
                     <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
-                        <td class="text-center">{{ $customer->nama }}</td>
-                        <td class="text-center">{{ $customer->kecamatan->name ?? '-' }}</td>
-                        <td class="text-center">{{ $customer->kabupaten->name ?? '-' }}</td>
-                        <td class="text-center">{{ $customer->provinsi->name ?? '-' }}</td>
+                        <td class="text-center">{{ $vendor->nama }}</td>
+                        <td class="text-center">{{ $vendor->kecamatan->name ?? '-' }}</td>
+                        <td class="text-center">{{ $vendor->kabupaten->name ?? '-' }}</td>
+                        <td class="text-center">{{ $vendor->provinsi->name ?? '-' }}</td>
                         <td class="text-center">
-                            <a class="btn btn-primary" href="{{ route('master.customer.show', $customer->id) }}" role="button">Show</a>
+                            <a class="btn btn-primary" href="{{ route('master.vendor.show', $vendor->id) }}" role="button">Show</a>
                             @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
-                            <a class="btn btn-warning" href="{{ route('master.customer.edit', $customer->id) }}" role="button">Edit</a>
-                            <form action="{{ route('master.customer.destroy', $customer->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                            <a class="btn btn-warning" href="{{ route('master.vendor.edit', $vendor->id) }}" role="button">Edit</a>
+                            <form action="{{ route('master.vendor.destroy', $vendor->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Delete</button>
@@ -55,7 +55,7 @@
                             @endif
                         </td>
                     </tr>
-                @endforeach
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -66,7 +66,7 @@
 @section('scripts')
 <script>
    $(document).ready(function() {
-        $('#customerTable').DataTable({
+        $('#vendorTable').DataTable({
            paging: true,
            pageLength: 5,
            lengthMenu: [5, 25, 50, 100],

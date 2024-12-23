@@ -23,6 +23,7 @@
                         <th class="text-center">Nama</th>
                         <th class="text-center">Email</th>
                         <th class="text-center">Role</th>
+                        <th class="text-center">Vendor</th>
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -33,6 +34,7 @@
                         <td class="text-center">{{ $user->name }}</td>
                         <td class="text-center">{{ $user->email }}</td>
                         <td class="text-center">{{ $user->role }}</td>
+                        <td class="text-center">{{ $user->vendor->nama ?? '-' }}</td>
                         <td class="text-center">
                             <a class="btn btn-warning" href="{{ route('admin.users.edit', $user->id) }}" role="button">
                                 <i class="fa fa-pencil" aria-hidden="true"></i>

@@ -8,6 +8,7 @@ use App\Models\Master\Provinsi;
 use App\Models\Master\Kabupaten;
 use App\Models\Master\Kelurahan;
 use App\Models\Master\Kecamatan;
+use App\Models\Master\Vendors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash; // Add this line
 use DB;
@@ -28,8 +29,8 @@ class UserManageController extends Controller
 
     public function create()
     {
-
         $data['provinsi'] = Provinsi::all();
+        $data['vendors'] = Vendors::all();
 
         return view('admin.users.create', $data);
     }
@@ -54,6 +55,7 @@ class UserManageController extends Controller
             'kabupaten_id' => $request->kota,
             'kecamatan_id' => $request->kecamatan,
             'kelurahan_id' => $request->kelurahan,
+            'vendor_id' => $request->vendor,
         ]);
 
         // Redirect back with a success message
@@ -62,11 +64,12 @@ class UserManageController extends Controller
 
     public function edit($id)
     {
-        $data['user'] = User::findOrFail($id);
-        $data['provinsi'] = Provinsi::get();
-        $data['kabupaten'] = Kabupaten::get();
-        $data['kelurahan'] = Kelurahan::get();
-        $data['kecamatan'] = Kecamatan::get();
+        $data['user']       = User::findOrFail($id);
+        $data['provinsi']   = Provinsi::get();
+        $data['kabupaten']  = Kabupaten::get();
+        $data['kelurahan']  = Kelurahan::get();
+        $data['kecamatan']  = Kecamatan::get();
+        $data['vendors']    = Vendors::get();
 
         return view('admin.users.edit', $data);
     }
@@ -80,8 +83,6 @@ class UserManageController extends Controller
             'role' => 'required|string',
             'password' => 'nullable|min:8|confirmed',
         ]);
-
-        // dd($request->all());
 
         // Retrieve the user to update
         $user = User::findOrFail($id);

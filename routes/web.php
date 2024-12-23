@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserManageController;
 use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Master\CustomerController;
+use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Master\StockGaController;
 use App\Http\Controllers\ApiConsumerController;
 
@@ -69,6 +70,15 @@ Route::delete('/master/customer/destroy/{id}', [CustomerController::class, 'dest
 Route::get('/stock_ga', [StockGaController::class, 'index'])->name('stock_ga.index');
 Route::post('/stock_ga/store', [StockGaController::class, 'store'])->name('stock_ga.store');
 Route::patch('/stock_ga/addStock/{id}', [StockGaController::class, 'addStock'])->name('stock_ga.addStock');
+
+// vendor
+Route::get('/master/vendor', [VendorController::class, 'index'])->name('master.vendor.index');
+Route::get('/master/vendor/create', [VendorController::class, 'create'])->name('master.vendor.create');
+Route::post('/master/vendor/store', [VendorController::class, 'store'])->name('master.vendor.store');
+Route::get('/master/vendor/show/{id}', [VendorController::class, 'show'])->name('master.vendor.show');
+Route::get('/master/vendor/edit/{id}', [VendorController::class, 'edit'])->name('master.vendor.edit');
+Route::put('/master/vendor/update/{id}', [VendorController::class, 'update'])->name('master.vendor.update');
+Route::delete('/master/vendor/destroy/{id}', [VendorController::class, 'destroy'])->name('master.vendor.destroy');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {

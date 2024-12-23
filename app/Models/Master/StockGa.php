@@ -10,7 +10,7 @@ class StockGa extends Model
     use HasFactory;
 
     protected $table = "stock_ga";
-    protected $fillable =[
+    protected $fillable = [
         'product_id', 
         'brand_name', 
         'qty',

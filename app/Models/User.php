@@ -30,7 +30,8 @@ class User extends Authenticatable
         'provinsi_id', 
         'kabupaten_id', 
         'kecamatan_id',
-        'kelurahan_id'
+        'kelurahan_id',
+        'vendor_id',
     ];
 
     /**
@@ -51,4 +52,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function vendor()
+    {
+        return $this->BelongsTo('App\Models\Master\Vendors', 'vendor_id', 'id');
+    }
 }

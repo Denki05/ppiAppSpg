@@ -2,125 +2,104 @@
 
 @section('content')
 <div class="container">
-    <h2>Create User</h2>
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
-    @if ($errors->any())
+    @if($errors->any())
         <div class="alert alert-danger">
             <ul>
                 @foreach ($errors->all() as $error)
-                    <li>{{ e($error) }}</li>
+                    <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
     @endif
 
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ e(session('success')) }}
-        </div>
-    @endif
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="breadcrumb-item" aria-current="page">Vendor</li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
 
-    <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+    <form action="{{ route('master.vendor.update', $vendors->id) }}" method="POST">
         @csrf
         @method('PUT')
-
         <div class="row g-3">
-            <!-- User Details -->
             <div class="col-md-6">
-                <label for="name" class="form-label">Name</label>
-                <input 
-                    type="text" 
-                    name="name" 
-                    id="name" 
-                    class="form-control" 
-                    value="{{ old('name', $user->name) }}" 
-                    required>
-            </div>
-            <div class="col-md-6">
-                <label for="email" class="form-label">Email</label>
-                <input 
-                    type="email" 
-                    name="email" 
-                    id="email" 
-                    class="form-control" 
-                    value="{{ old('email', $user->email) }}" 
-                    required>
-            </div>
-            <div class="col-md-6">
-                <label for="password" class="form-label">Password</label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    id="password" 
-                    class="form-control" 
-                    placeholder="Leave blank if not changing">
-            </div>
-            <div class="col-md-6">
-                <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input 
-                    type="password" 
-                    name="password_confirmation" 
-                    id="password_confirmation" 
-                    class="form-control" 
-                    placeholder="Leave blank if not changing">
-            </div>
-
-            <!-- Dropdowns -->
-            <div class="col-md-6">
-                <label for="role" class="form-label">Role</label>
-                <select name="role" id="role" class="form-control select2" required>
-                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="spg" {{ $user->role === 'spg' ? 'selected' : '' }}>SPG</option>
-                </select>
+                <label for="name" class="form-label">Nama Toko</label>
+                <input type="text" name="name" id="name" class="form-control" 
+                       value="{{ old('name', $vendors->nama) }}" required>
+                @error('name') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
 
             <div class="col-md-6">
-                <label for="vendor" class="form-label">Vendor</label>
-                <select name="vendor" id="vendor" class="form-control select2" required>
-                    <option value="">Select Vendor</option>
-                    @foreach($vendors as $vendor)
-                        <option value="{{ $vendor->id }}" {{ old('vendor', $user->vendor_id) == $vendor->id ? 'selected' : '' }}>
-                            {{ $vendor->nama }}
-                        </option>
-                    @endforeach
-                </select>
+                <label for="alamat" class="form-label">Alamat Toko</label>
+                <input type="text" name="alamat" id="alamat" class="form-control" 
+                       value="{{ old('alamat', $vendors->alamat) }}" required>
+                @error('alamat') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
 
-            <!-- Cascading Dropdowns -->
+            <div class="col-md-6">
+                <label for="phone" class="form-label">Telepon</label>
+                <input type="number" class="form-control" id="phone" name="phone" 
+                       value="{{ old('phone', $vendors->phone) }}" required>
+                @error('phone') <div class="text-danger">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-6">
+                <label for="owner" class="form-label">Owner</label>
+                <input type="text" class="form-control" id="owner" name="owner" 
+                       value="{{ old('owner', $vendors->owner) }}" required>
+                @error('owner') <div class="text-danger">{{ $message }}</div> @enderror
+            </div>
+
             <div class="col-md-6">
                 <label for="provinsi" class="form-label">Provinsi</label>
                 <select name="provinsi" id="provinsi" class="form-control select2" required>
-                    <option value="">Select Provinsi</option>
-                    @foreach($provinsi as $prov)
-                        <option value="{{ $prov->id }}" {{ old('provinsi', $user->provinsi_id) == $prov->id ? 'selected' : '' }}>
-                            {{ $prov->name }}
+                    <option value="">Pilih Provinsi</option>
+                    @foreach($provinsi as $key)
+                        <option value="{{ $key->id }}" 
+                                {{ old('provinsi', $vendors->provinsi_id) == $key->id ? 'selected' : '' }}>
+                            {{ $key->name }}
                         </option>
                     @endforeach
                 </select>
+                @error('provinsi') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
+
             <div class="col-md-6">
                 <label for="kota" class="form-label">Kota</label>
-                <select name="kota" id="kota" class="form-control select2" required>
-                    <option value="">Select Kota</option>
+                <select class="form-select select2" id="kota" name="kota" required disabled>
+                    <option value="">Pilih Kota</option>
                 </select>
+                @error('kota') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
+
             <div class="col-md-6">
                 <label for="kecamatan" class="form-label">Kecamatan</label>
-                <select name="kecamatan" id="kecamatan" class="form-control select2" required>
-                    <option value="">Select Kecamatan</option>
+                <select class="form-select select2" id="kecamatan" name="kecamatan" required disabled>
+                    <option value="">Pilih Kecamatan</option>
                 </select>
+                @error('kecamatan') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
+
             <div class="col-md-6">
                 <label for="kelurahan" class="form-label">Kelurahan</label>
-                <select name="kelurahan" id="kelurahan" class="form-control select2" required>
-                    <option value="">Select Kelurahan</option>
+                <select class="form-select select2" id="kelurahan" name="kelurahan" required disabled>
+                    <option value="">Pilih Kelurahan</option>
                 </select>
+                @error('kelurahan') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
-        </div>
 
-        <div class="mt-4">
-            <a class="btn btn-danger" href="{{ route('admin.users') }}" role="button">Back</a>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <div class="mt-4">
+                <a class="btn btn-danger" href="{{ route('master.vendor.index') }}" role="button">Back</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
         </div>
     </form>
 </div>
@@ -128,7 +107,7 @@
 
 @section('scripts')
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('.select2').select2();
 
         $('#provinsi').change(function () {

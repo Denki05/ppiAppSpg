@@ -112,7 +112,7 @@
                                     </li>
                                     @endif
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" href="{{ route('master.vendor.index') }}">
                                             <i class="fa-solid fa-building"></i> Vendor
                                         </a>
                                     </li>
