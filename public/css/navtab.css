@@ -25,3 +25,21 @@
     font-size: 1rem;
     color: #666;
 }
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-top: -0.1rem;
+    margin-left: 0.1rem;
+    z-index: 1000;
+}
+
+.dropdown-submenu:hover .dropdown-menu {
+    display: block;
+}

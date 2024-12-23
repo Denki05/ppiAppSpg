@@ -42,7 +42,6 @@
             <label for="role" class="form-label">Role</label>
             <select class="form-select select2" id="role" name="role" required>
                 <option value="">Pilih Role</option>
-                <option value="user">User</option>
                 <option value="admin">Admin</option>
                 <option value="spg">Spg</option>
             </select>

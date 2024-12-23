@@ -96,7 +96,9 @@ class SalesController extends Controller
 
             // Input penjualan GA
             foreach ($request->variant as $index => $variant) {
-                $stock = StockGa::find($variant);
+                $stock = StockGa::where('product_id', $variant)->first();
+
+                // dd($stock->qty);
 
                 if (!$stock || $stock->qty < $request->qty[$index]) {
                     DB::rollback();

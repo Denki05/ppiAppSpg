@@ -46,6 +46,28 @@
 
     <!-- Select2 JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Aktifkan submenu
+            document.querySelectorAll('.dropdown-submenu').forEach(function (element) {
+                element.addEventListener('mouseenter', function () {
+                    let submenu = this.querySelector('.dropdown-menu');
+                    if (submenu) {
+                        submenu.style.display = 'block';
+                    }
+                });
+
+                element.addEventListener('mouseleave', function () {
+                    let submenu = this.querySelector('.dropdown-menu');
+                    if (submenu) {
+                        submenu.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+    </script>
 </head>
 <body>
     <div id="app">
@@ -66,28 +88,37 @@
                                     <i class="fa-solid fa-house"></i> Home
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('master.customer.index') }}">
-                                    <i class="fa-regular fa-user"></i> Customer
-                                </a>
-                            </li>
-                            @if (auth()->user()->role == 'admin' OR auth()->user()->role == 'user')
+
+                            <!-- master -->
                             <li class="nav-item dropdown">
-                                <a id="adminDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-brands fa-product-hunt" aria-hidden="true"></i> Product
+                                <a id="adminDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-file"></i> Master
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('product') }}">
-                                            <i class="fa fa-users" aria-hidden="true"></i> List
+                                        <a class="dropdown-item" href="{{ route('master.customer.index') }}">
+                                            <i class="fa-solid fa-user" aria-hidden="true"></i> Customer
                                         </a>
-                                        <a class="dropdown-item" href="{{ route('stock_ga.index') }}">
-                                            <i class="fa-solid fa-boxes-packing" aria-hidden="true"></i> Stock
+                                    </li>
+                                    @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">
+                                            <i class="fa-solid fa-layer-group"></i> Product
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{{ route('product') }}"><i class="fa fa-list" aria-hidden="true"></i> List</a></li>
+                                            <li><a class="dropdown-item" href="{{ route('stock_ga.index') }}"> <i class="fa-solid fa-boxes-packing" aria-hidden="true"></i> Stock GA</a></li>
+                                        </ul>
+                                    </li>
+                                    @endif
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fa-solid fa-building"></i> Vendor
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                            @endif
+
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Jurnal
@@ -108,7 +139,7 @@
                                     <i class="fa-solid fa-eye"></i> Review - Settel
                                 </a>
                             </li>
-                            @if (auth()->user()->role == 'admin')
+                            @if (auth()->user()->role == 'dev')
                             <li class="nav-item dropdown">
                                 <a id="adminDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-solid fa-gears"></i> Setting

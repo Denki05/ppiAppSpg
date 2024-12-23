@@ -59,9 +59,6 @@
                                 @endif
                             </td>
                             <td class="text-center">
-                                <a class="btn btn-info" href="" role="button">
-                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                </a>
                                 <form action="{{ route('penjualan.destroy', $sale->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah kamu yakin menghapus jurnal ini?');">
                                     @csrf
                                     @method('DELETE')
