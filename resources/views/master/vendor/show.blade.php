@@ -61,7 +61,7 @@
         <div class="mt-4">
             <a class="btn btn-danger" href="{{ route('master.vendor.index') }}" role="button">Back</a>
             @if (auth()->user()->role == 'admin' OR auth()->user()->role == 'user')
-            <a class="btn btn-warning" href="{{ route('master.vendor.index') }}" role="button">Edit</a>
+            <!-- <a class="btn btn-warning" href="{{ route('master.vendor.index') }}" role="button">Edit</a> -->
             @endif
         </div>
     </div>

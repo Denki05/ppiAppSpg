@@ -63,9 +63,9 @@ class SalesController extends Controller
             'customer_non_dom' => 'nullable|exists:master_customer,id',
             'customerCash' => 'nullable|numeric|min:0',
             'brand_name' => 'required|string',
-            'variant' => 'required|array',
-            'qty' => 'required|array',
-            'qty.*' => 'required|numeric|min:1',
+            'variant' => 'nullable|array',
+            'qty' => 'nullable|array',
+            'qty.*' => 'nullable|numeric|min:1',
             'transaksi' => 'required|array',
             'transaksi_qty' => 'required|array',
             'transaksi_qty.*' => 'required|numeric|min:1',
@@ -94,26 +94,26 @@ class SalesController extends Controller
             $penjualan->created_by = Auth::id();
             $penjualan->save();
 
-            // Input penjualan GA
-            foreach ($request->variant as $index => $variant) {
-                $stock = StockGa::where('product_id', $variant)->first();
+            // Input penjualan GA (optional)
+            if (!empty($request->variant) && !empty($request->qty)) {
+                foreach ($request->variant as $index => $variant) {
+                    $stock = StockGa::where('product_id', $variant)->first();
 
-                // dd($stock->qty);
+                    if (!$stock || $stock->qty < $request->qty[$index]) {
+                        DB::rollback();
+                        return redirect()->back()->withErrors(['error' => 'Stock variant Give Away: ' . $variant . ' tidak mencukupi!']);
+                    }
 
-                if (!$stock || $stock->qty < $request->qty[$index]) {
-                    DB::rollback();
-                    return redirect()->back()->withErrors(['error' => 'Stock variant Give Away: ' . $variant . ' tidak mencukupi!']);
+                    SalesOrderGa::create([
+                        'so_id' => $penjualan->id,
+                        'product_packaging_id' => $variant,
+                        'qty' => $request->qty[$index],
+                    ]);
+
+                    // Reduce stock
+                    $stock->qty -= $request->qty[$index];
+                    $stock->save();
                 }
-
-                SalesOrderGa::create([
-                    'so_id' => $penjualan->id,
-                    'product_packaging_id' => $variant,
-                    'qty' => $request->qty[$index],
-                ]);
-
-                // Reduce stock
-                $stock->qty -= $request->qty[$index];
-                $stock->save();
             }
 
             // Input penjualan item
@@ -135,14 +135,8 @@ class SalesController extends Controller
             // Rollback the transaction in case of error
             DB::rollback();
 
-            // Log the error (optional)
-            \Log::error('Failed to store transaction', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             // Redirect with error message
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data transaksi.');
         }
     }
 

@@ -22,10 +22,23 @@ class UserManageController extends Controller
 
     public function index() 
     {
-        $data['users'] = User::all();
+        $currentUserRole = auth()->user()->role;
 
-        return view('admin.users.index', $data);
+        // Variabel users akan diisi sesuai role
+        if ($currentUserRole === 'admin') {
+            $users = User::where('role', 'spg')->get(); // Tampilkan hanya pengguna dengan role 'spg'
+        } 
+        else if ($currentUserRole === 'dev') {
+            $users = User::all(); // Tampilkan semua pengguna
+        } 
+        else {
+            $users = collect(); // Mengembalikan collection kosong jika role tidak sesuai
+        }
+
+        // Kirim variabel users ke view
+        return view('admin.users.index', compact('users'));
     }
+
 
     public function create()
     {
@@ -95,6 +108,7 @@ class UserManageController extends Controller
         $user->kabupaten_id = $request->kota;
         $user->kecamatan_id = $request->kecamatan;
         $user->kelurahan_id = $request->kelurahan;
+        $user->vendor_id = $request->vendor;
 
         // Update password only if a new password is provided
         if ($request->filled('password')) {
