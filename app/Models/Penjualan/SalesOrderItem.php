@@ -3,6 +3,7 @@
 namespace App\Models\Penjualan;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Http;
 
 class SalesOrderItem extends Model
 {
@@ -21,5 +22,26 @@ class SalesOrderItem extends Model
 
     public function so(){
         return $this->BelongsTo('App\Models\Penjualan\SalesOrder','so_id','id');
+    }
+
+    public function getProductDataFromApi($productId)
+    {
+        // Fetch all products from the API
+        $response = Http::get("http://ppiapps.sytes.net:8000/api/products");
+
+        if ($response->successful()) {
+            $products = $response->json();
+
+            // Filter products based on the product ID
+            $filteredProducts = array_filter($products, function ($product) use ($productId) {
+                return isset($product['id']) && $product['id'] === $productId;
+            });
+
+            // Return the first matching product or null if not found
+            return !empty($filteredProducts) ? reset($filteredProducts) : null;
+        }
+
+        // Return null if the API call fails
+        return null;
     }
 }

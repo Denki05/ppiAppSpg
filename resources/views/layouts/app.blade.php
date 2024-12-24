@@ -135,8 +135,13 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('penjualan.index') }}">
-                                    <i class="fa-solid fa-eye"></i> Review - Settel
+                                <a class="nav-link" href="{{ route('penjualan.review') }}">
+                                    <i class="fa-solid fa-eye"></i> Review
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('penjualan.settle') }}">
+                                    <i class="fa-solid fa-check"></i> Settel
                                 </a>
                             </li>
                             @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')

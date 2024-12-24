@@ -50,9 +50,14 @@ Route::get('/admin/users/{kecamatanID}/getKelurahan', [UserManageController::cla
 
 // Penjualan
 Route::get('/penjualan', [SalesController::class, 'index'])->name('penjualan.index');
+Route::get('/penjualan/review', [SalesController::class, 'review'])->name('penjualan.review');
+Route::get('/penjualan/settle', [SalesController::class, 'settle'])->name('penjualan.settle');
+Route::get('/penjualan', [SalesController::class, 'index'])->name('penjualan.index');
 Route::get('/penjualan/create_senses', [SalesController::class, 'create_senses'])->name('penjualan.create_senses');
 Route::get('/penjualan/create_gcf', [SalesController::class, 'create_gcf'])->name('penjualan.create_gcf');
 Route::post('/penjualan/store', [SalesController::class, 'store'])->name('penjualan.store');
+Route::get('/penjualan/edit/{id}', [SalesController::class, 'edit'])->name('penjualan.edit');
+Route::put('/penjualan/update/{id}', [SalesController::class, 'update'])->name('penjualan.update');
 Route::delete('/penjualan/{id}', [SalesController::class, 'destroy'])->name('penjualan.destroy');
 Route::get('/penjualan/checkCustomerDOM', [SalesController::class, 'checkCustomerDOM'])->name('penjualan.checkCustomerDOM');
 Route::get('/penjualan/checkCustomerOUTDOM', [SalesController::class, 'checkCustomerOUTDOM'])->name('penjualan.checkCustomerOUTDOM');
