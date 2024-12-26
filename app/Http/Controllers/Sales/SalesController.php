@@ -381,50 +381,54 @@ class SalesController extends Controller
     }
 
     public function checkCustomerDOM()
-    {
-        // Get the authenticated user
-        $user = User::find(Auth::id());
+{
+    $user = User::find(Auth::id());
 
-        // Fetch customers with related location data
-        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
-            ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-            ->where('master_customer.provinsi_id', $user->provinsi_id)
-            ->where('master_customer.kabupaten_id', $user->kabupaten_id)
-            ->select(
-                'master_customer.id as customer_id',
-                'master_customer.nama as customer_nama', 
-                'districts.name as customer_kecamatan',
-                'regencies.name as customer_kota', 
-                'provinces.name as customer_provinsi'
-            )
-            ->get();
+    $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
+        ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
+        ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
+        ->where('master_customer.provinsi_id', $user->provinsi_id)
+        ->where('master_customer.kabupaten_id', $user->kabupaten_id)
+        ->select(
+            'master_customer.id as customer_id',
+            'master_customer.nama as customer_nama', 
+            'districts.name as customer_kecamatan',
+            'regencies.name as customer_kota', 
+            'provinces.name as customer_provinsi'
+        )
+        ->get();
 
-        // Return customers as JSON
-        return response()->json($customers);
-    }
+    $cityPlaceholder = $customers->isNotEmpty() ? $user->kabupaten->name : 'Domisili';
 
-    public function checkCustomerOUTDOM()
-    {
-        // Get the authenticated user
-        $user = User::find(Auth::id());
+    return response()->json([
+        'customers' => $customers,
+        'placeholder' => "PILIH $cityPlaceholder"
+    ]);
+}
 
-        // Fetch customers from a different province or regency
-        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
-            ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-            // ->where('master_customer.provinsi_id', '!=', $user->provinsi_id)
-            ->Where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
-            ->select(
-                'master_customer.id as customer_id',
-                'master_customer.nama as customer_nama',
-                'districts.name as customer_kecamatan',
-                'regencies.name as customer_kota',
-                'provinces.name as customer_provinsi'
-            )
-            ->get();
+public function checkCustomerOUTDOM()
+{
+    $user = User::find(Auth::id());
 
-        // Return customers as JSON
-        return response()->json($customers);
-    }
+    $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
+        ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
+        ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
+        ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+        ->select(
+            'master_customer.id as customer_id',
+            'master_customer.nama as customer_nama',
+            'districts.name as customer_kecamatan',
+            'regencies.name as customer_kota',
+            'provinces.name as customer_provinsi'
+        )
+        ->get();
+
+    $cityPlaceholder = $customers->isNotEmpty() ? "LUAR {$user->kabupaten->name}" : 'Luar Domisili';
+
+    return response()->json([
+        'customers' => $customers,
+        'placeholder' => "PILIH $cityPlaceholder"
+    ]);
+}
+
 }

@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->BelongsTo('App\Models\Master\Vendors', 'vendor_id', 'id');
     }
+
+    public function kabupaten()
+    {
+        return $this->BelongsTo('App\Models\Master\Kabupaten', 'kabupaten_id', 'id');
+    }
 }

@@ -89,6 +89,15 @@
                                 </a>
                             </li>
 
+                            @if (auth()->user()->role == 'spg')
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('master.customer.index') }}">
+                                    <i class="fa-solid fa-user" aria-hidden="true"></i> Customer
+                                </a>
+                            </li>
+                            @endif
+
+                            @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
                             <!-- master -->
                             <li class="nav-item dropdown">
                                 <a id="adminDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -105,7 +114,7 @@
                                             <i class="fa-solid fa-building"></i> Vendor
                                         </a>
                                     </li>
-                                    @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
+                                    
                                     <li class="dropdown-submenu">
                                         <a class="dropdown-item dropdown-toggle" href="#">
                                             <i class="fa-solid fa-layer-group"></i> Product
@@ -120,10 +129,11 @@
                                             <i class="fa fa-users" aria-hidden="true"></i> Users
                                         </a>
                                     </li>
-                                    @endif
                                 </ul>
                             </li>
+                            @endif
 
+                            <!-- Jurnal -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Jurnal

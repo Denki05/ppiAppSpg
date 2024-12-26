@@ -33,12 +33,12 @@
             <div class="form-group row" id="customerForm">
                 <label class="col-12 col-md-2 col-form-label text-right" for="contact_person">Customer :</label>
                 <div class="col-12 col-md-5 mb-2 mb-md-0">
-                    <select name="customer_dom" id="customer_dom" class="form-control select2"  style="width: 100%;">
+                    <select name="customer_dom" id="customer_dom" class="form-control select2" style="width: 100%;">
                         <option value="">Pilih Kota Domisili</option>
                     </select>
                 </div>
                 <div class="col-12 col-md-5">
-                    <select name="customer_non_dom" id="customer_non_dom" class="form-control select2"  style="width: 100%;">
+                    <select name="customer_non_dom" id="customer_non_dom" class="form-control select2" style="width: 100%;">
                         <option value="">Pilih Kota Luar Domisili</option>
                     </select>
                 </div>
@@ -156,10 +156,12 @@ $(document).ready(function () {
             url: url,
             type: "GET",
             dataType: "json",
-            success: function (data) {
+            success: function (response) {
                 let selectElement = type === 'DOM' ? $('#customer_dom') : $('#customer_non_dom');
-                selectElement.empty().append(`<option value="">Pilih Kota ${type === 'DOM' ? 'Domisili' : 'Luar Domisili'}</option>`);
-                data.forEach(function (customer) {
+                selectElement.empty();
+                selectElement.append(`<option value="">${response.placeholder}</option>`);
+
+                response.customers.forEach(function (customer) {
                     selectElement.append(`<option value="${customer.customer_id}">${customer.customer_nama} - ${customer.customer_kota}, ${customer.customer_provinsi}</option>`);
                 });
             },
