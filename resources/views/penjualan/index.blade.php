@@ -23,7 +23,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-eye"></i> Review - Settel</li>
+            <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-eye"></i> Index</li>
         </ol>
     </nav>
 

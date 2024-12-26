@@ -140,6 +140,7 @@ class SalesController extends Controller
 
                     // Reduce stock
                     $stock->qty -= $request->qty[$index];
+                    $stock->pcs = $stock->qty / 45;
                     $stock->save();
                 }
             }
@@ -225,11 +226,14 @@ class SalesController extends Controller
 
             // Update penjualan GA (optional)
             // Restore the previous stock before deleting SalesOrderGa
+            $default_ml_pcs = 45;
             $previousSalesGa = SalesOrderGa::where('so_id', $penjualan->id)->get();
             foreach ($previousSalesGa as $salesGa) {
                 $stock = StockGa::where('product_id', $salesGa->product_packaging_id)->first();
                 if ($stock) {
                     $stock->qty += $salesGa->qty;
+                    $get_pcs = $stock->qty / $default_ml_pcs;
+                    $stock->pcs = $get_pcs;
                     $stock->save();
                 }
             }
@@ -255,6 +259,7 @@ class SalesController extends Controller
 
                     // Reduce stock
                     $stock->qty -= $request->qty[$index];
+                    $stock->pcs = $stock->qty / 45;
                     $stock->save();
                 }
             }
@@ -275,6 +280,7 @@ class SalesController extends Controller
             // Redirect with success message
             return redirect()->back()->with('success', 'Data transaksi telah diperbarui.');
         } catch (\Exception $e) {
+            dd($e);
             // Rollback the transaction in case of error
             DB::rollback();
 
