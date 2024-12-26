@@ -116,6 +116,13 @@
                                             <i class="fa-solid fa-building"></i> Vendor
                                         </a>
                                     </li>
+                                    @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.users') }}">
+                                            <i class="fa fa-users" aria-hidden="true"></i> Users
+                                        </a>
+                                    </li>
+                                    @endif
                                 </ul>
                             </li>
 
@@ -144,20 +151,6 @@
                                     <i class="fa-solid fa-check"></i> Settel
                                 </a>
                             </li>
-                            @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
-                            <li class="nav-item dropdown">
-                                <a id="adminDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-gears"></i> Setting
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('admin.users') }}">
-                                            <i class="fa fa-users" aria-hidden="true"></i> Manage Users
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            @endif
                         @endauth
                     </ul>
 
