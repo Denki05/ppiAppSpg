@@ -295,8 +295,19 @@ class SalesController extends Controller
             // Find the sales order by its ID
             $sales = SalesOrder::findOrFail($id);
 
-            // Delete the sales order
-            $sales->status = 0 ;
+            // Restore the stock before deleting SalesOrderGa
+            $salesGaItems = SalesOrderGa::where('so_id', $sales->id)->get();
+            foreach ($salesGaItems as $salesGa) {
+                $stock = StockGa::where('product_id', $salesGa->product_packaging_id)->first();
+                if ($stock) {
+                    $stock->qty += $salesGa->qty;
+                    $stock->pcs = $stock->qty / 45;
+                    $stock->save();
+                }
+            }
+
+            // Soft delete the sales order
+            $sales->status = 0;
             $sales->updated_by = Auth::user()->id;
             $sales->deleted_at = now();
             $sales->save();
