@@ -100,6 +100,11 @@
                                             <i class="fa-solid fa-user" aria-hidden="true"></i> Customer
                                         </a>
                                     </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('master.vendor.index') }}">
+                                            <i class="fa-solid fa-building"></i> Vendor
+                                        </a>
+                                    </li>
                                     @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
                                     <li class="dropdown-submenu">
                                         <a class="dropdown-item dropdown-toggle" href="#">
@@ -110,13 +115,6 @@
                                             <li><a class="dropdown-item" href="{{ route('stock_ga.index') }}"> <i class="fa-solid fa-boxes-packing" aria-hidden="true"></i> Stock GA</a></li>
                                         </ul>
                                     </li>
-                                    @endif
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('master.vendor.index') }}">
-                                            <i class="fa-solid fa-building"></i> Vendor
-                                        </a>
-                                    </li>
-                                    @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
                                     <li>
                                         <a class="dropdown-item" href="{{ route('admin.users') }}">
                                             <i class="fa fa-users" aria-hidden="true"></i> Users
