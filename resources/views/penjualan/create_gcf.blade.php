@@ -120,7 +120,11 @@
                         <label for="variantSelect" class="form-label">Variant</label>
                         <select class="form-control select2" id="variantSelect" name="variant">
                             <option value="">Pilih Variant</option>
-                            <!-- Variant options will be populated via JavaScript -->
+                            @foreach ($stock_ga as $item)
+                                <option value="{{ $item['product_id'] }}">
+                                    {{ $item['code'] }} - {{ $item['name'] }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
@@ -201,7 +205,6 @@ $(document).ready(function () {
         bInfo: false,
         searching: false,
         ordering: false,
-        order: [[0, 'desc']],
     });
 
     // Hide the table initially if there is no data
@@ -220,30 +223,20 @@ $(document).ready(function () {
     $('#openGAModal').on('click', function () {
         $('#gaModal').modal('show');
 
-        // Populate variant options in the modal if product data is available
-        if (product_data.length > 0) {
-            const variantSelect = $('#variantSelect');
-            variantSelect.empty().append('<option value="">Pilih Variant</option>');
-            product_data.forEach(product => {
-                variantSelect.append(`<option value="${product.id}">${product.code} - ${product.name}</option>`);
-            });
-
-            // Initialize Select2 for variant dropdown in modal
-            variantSelect.select2({
-                dropdownParent: $('#gaModal'), // Ensure dropdown is inside the modal
-                width: '100%',
-            });
-        } else {
-            alert('Data produk belum tersedia. Harap tunggu sebentar.');
-        }
+        // Initialize select2 for variant dropdown inside the modal
+        $('#variantSelect').select2({
+            dropdownParent: $('#gaModal'), // Ensure dropdown appears within modal
+            width: '100%',
+        });
     });
 
     // Save give away item to the table
     $('#saveGA').on('click', function () {
-        const variant = $('#variantSelect').val();
-        const variantText = $('#variantSelect option:selected').text();
-        const qty = $('#qtyInput').val();
+        const variant = $('#variantSelect').val(); // Get selected variant ID
+        const variantText = $('#variantSelect option:selected').text(); // Get selected variant text
+        const qty = $('#qtyInput').val(); // Get entered quantity
 
+        // Validation: Ensure fields are not empty
         if (!variant || !qty) {
             alert('Harap isi semua data sebelum menyimpan.');
             return;
@@ -253,13 +246,13 @@ $(document).ready(function () {
         gaTable.row.add([
             `<input type="hidden" name="variant[]" value="${variant}">${variantText}`,
             `<input type="hidden" name="qty[]" value="${qty}">${qty}`,
-            '<button class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>',
+            `<button class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>`,
         ]).draw();
 
         // Update table visibility
         updateTableVisibility();
 
-        // Reset the modal form and close the modal
+        // Reset form and close modal
         $('#gaForm')[0].reset();
         $('#gaModal').modal('hide');
     });
@@ -268,7 +261,7 @@ $(document).ready(function () {
     $(document).on('click', '.delete-row', function () {
         gaTable.row($(this).closest('tr')).remove().draw();
 
-        // Update table visibility after row deletion
+        // Update table visibility after deleting a row
         updateTableVisibility();
     });
 

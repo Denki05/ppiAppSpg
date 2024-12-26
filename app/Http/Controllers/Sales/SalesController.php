@@ -66,6 +66,17 @@ class SalesController extends Controller
         $data['products'] = $apiConsumer->getItemsProducts();
         $data['brands'] = $apiConsumer->getItemsBrands();
         $data['customer'] = Customer::get();
+        
+        $stockGaItems = StockGa::where('brand_name', 'Senses')->get();
+        $data['stock_ga'] = $stockGaItems->map(function ($item) {
+            $productData = $item->getProductDataFromApi($item->product_id);
+            return [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'name' => $productData['name'] ?? null,
+                'code' => $productData['code'] ?? null,
+            ];
+        });
 
         // Pass the product and unit weight data to the view
         return view('penjualan.create_senses', $data);
@@ -78,6 +89,17 @@ class SalesController extends Controller
         $data['products'] = $apiConsumer->getItemsProducts();
         $data['brands'] = $apiConsumer->getItemsBrands();
         $data['customer'] = Customer::get();
+        
+        $stockGaItems = StockGa::where('brand_name', 'GCF')->get();
+        $data['stock_ga'] = $stockGaItems->map(function ($item) {
+            $productData = $item->getProductDataFromApi($item->product_id);
+            return [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'name' => $productData['name'] ?? null,
+                'code' => $productData['code'] ?? null,
+            ];
+        });
 
         // Pass the product and unit weight data to the view
         return view('penjualan.create_gcf', $data);
@@ -108,50 +130,54 @@ class SalesController extends Controller
             $customer_type = !empty($request->customerCash) ? 1 : 0;
 
             if (!$customer_id && $customer_type === 0) {
-                return redirect()->back()->withErrors(['error' => 'You must select a customer or provide cash value.']);
+                return redirect()->back()->withErrors(['error' => 'You must select a customer or provide a cash value.']);
             }
 
-            // Input penjualan index
-            $penjualan = new SalesOrder;
-            $penjualan->kode = SalesOrder::generateSO();
-            $penjualan->customer_id = $customer_id;
-            $penjualan->type = $customer_type;
-            $penjualan->brand_name = $request->brand_name;
-            $penjualan->tanggal_order = date('Y-m-d');
-            $penjualan->status = 2;
-            $penjualan->created_by = Auth::id();
-            $penjualan->save();
+            // Create sales order (penjualan index)
+            $penjualan = SalesOrder::create([
+                'kode' => SalesOrder::generateSO(),
+                'customer_id' => $customer_id,
+                'type' => $customer_type,
+                'brand_name' => $request->brand_name,
+                'tanggal_order' => now()->toDateString(),
+                'status' => 2,
+                'created_by' => Auth::id(),
+            ]);
 
-            // Input penjualan GA (optional)
+            // Handle "Give Away" (GA) items if applicable
             if (!empty($request->variant) && !empty($request->qty)) {
                 foreach ($request->variant as $index => $variant) {
                     $stock = StockGa::where('product_id', $variant)->first();
+                    // dd($variant);
 
+                    // Validate stock availability
                     if (!$stock || $stock->qty < $request->qty[$index]) {
                         DB::rollback();
-                        return redirect()->back()->withErrors(['error' => 'Stock variant Give Away: ' . $variant . ' tidak mencukupi!']);
+                        return redirect()->back()->withErrors([
+                            'error' => 'Stock for Give Away variant: ' . $variant . ' is insufficient!'
+                        ]);
                     }
 
+                    // Create GA record and adjust stock
                     SalesOrderGa::create([
                         'so_id' => $penjualan->id,
                         'product_packaging_id' => $variant,
                         'qty' => $request->qty[$index],
                     ]);
 
-                    // Reduce stock
-                    $stock->qty -= $request->qty[$index];
-                    $stock->pcs = $stock->qty / 45;
+                    $stock->decrement('qty', $request->qty[$index]);
+                    $stock->pcs = $stock->qty / 45; // Update `pcs` field accordingly
                     $stock->save();
                 }
             }
 
-            // Input penjualan item
+            // Handle main transaction items
             foreach ($request->transaksi as $index => $transaksi) {
                 SalesOrderItem::create([
                     'so_id' => $penjualan->id,
                     'product_id' => $transaksi,
                     'qty' => $request->transaksi_qty[$index],
-                    'unit_weight' => 1,
+                    'unit_weight' => 1, // Assuming a default weight of 1
                 ]);
             }
 
@@ -159,13 +185,18 @@ class SalesController extends Controller
             DB::commit();
 
             // Redirect with success message
-            return redirect()->back()->with('success', 'Data transaksi telah disimpan.');
+            return redirect()->back()->with('success', 'Transaction data has been successfully saved.');
         } catch (\Exception $e) {
             // Rollback the transaction in case of error
             DB::rollback();
 
+            // Log the exception for debugging
+            Log::error('Transaction Store Error: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString()
+            ]);
+
             // Redirect with error message
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data transaksi.');
+            return redirect()->back()->with('error', 'An error occurred while saving the transaction.');
         }
     }
 
