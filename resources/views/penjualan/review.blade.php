@@ -88,7 +88,7 @@
                                                     <div class="col-md-6">
                                                         <p><strong>Customer:</strong>
                                                             @if($sale->type == 0)
-                                                                {{ $sale->customer->nama }}, {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
+                                                                {{ $sale->customer->nama }} - {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
                                                             @else
                                                                 CASH
                                                             @endif
@@ -161,6 +161,10 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
+                                                <form action="{{ route('penjualan.settel', $sale->id) }}" method="POST" style="display:inline;">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-primary">Settel</button>
+                                                </form>
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>

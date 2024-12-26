@@ -58,6 +58,7 @@ Route::get('/penjualan/create_gcf', [SalesController::class, 'create_gcf'])->nam
 Route::post('/penjualan/store', [SalesController::class, 'store'])->name('penjualan.store');
 Route::get('/penjualan/edit/{id}', [SalesController::class, 'edit'])->name('penjualan.edit');
 Route::put('/penjualan/update/{id}', [SalesController::class, 'update'])->name('penjualan.update');
+Route::post('/penjualan/settel/{id}', [SalesController::class, 'settel'])->name('penjualan.settel');
 Route::delete('/penjualan/{id}', [SalesController::class, 'destroy'])->name('penjualan.destroy');
 Route::get('/penjualan/checkCustomerDOM', [SalesController::class, 'checkCustomerDOM'])->name('penjualan.checkCustomerDOM');
 Route::get('/penjualan/checkCustomerOUTDOM', [SalesController::class, 'checkCustomerOUTDOM'])->name('penjualan.checkCustomerOUTDOM');

@@ -289,6 +289,26 @@ class SalesController extends Controller
         }
     }
 
+    public function settel($id)
+    {
+        try{
+            // Find the sales order by its ID
+            $sales = SalesOrder::findOrFail($id);
+
+            // Update the sales order status to settled
+            $sales->status = 3;
+            $sales->updated_by = Auth::user()->id;
+            $sales->save();
+
+            // Redirect back with success message
+            return redirect()->route('penjualan.settle')->with('success', 'Jurnal berhasil di setel.');
+
+        } catch (\Exception $e) {
+            // Handle the error and redirect back with error message
+            return redirect()->route('penjualan.settle')->with('error', 'Gagal menyetel Jurnal.');
+        }
+    }
+
     public function destroy($id)
     {
         try {

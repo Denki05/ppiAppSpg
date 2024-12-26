@@ -58,8 +58,113 @@
                                     CASH
                                 @endif
                             </td>
-                            <td class="text-center">
-                                
+                            <td>
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saleModal{{ $sale->id }}">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+
+                                <!-- modal show -->
+                                <div class="modal fade" id="saleModal{{ $sale->id }}" tabindex="-1" aria-labelledby="saleModalLabel{{ $sale->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="saleModalLabel{{ $sale->id }}">Jurnal Detail {{ $sale->kode }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Kode:</strong> {{ $sale->kode }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><strong>Tanggal:</strong> {{ $sale->tanggal_order }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Brand:</strong> {{ $sale->brand_name }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><strong>Customer:</strong>
+                                                            @if($sale->type == 0)
+                                                                {{ $sale->customer->nama }} - {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
+                                                            @else
+                                                                CASH
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <hr>
+
+                                                <div class="row mb-3">
+                                                    <div class="col-md-12">
+                                                        <p><strong>Item Jurnal Transaksi:</strong></p>
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>#</th>
+                                                                    <th>Variant</th>
+                                                                    <th>Qty</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($sale->item as $items)
+                                                                    @php
+                                                                        // Fetch product data
+                                                                        $productData = $items->getProductDataFromApi($items->product_id);
+                                                                    @endphp
+                                                                    <tr>
+                                                                        <td>{{ $loop->iteration }}</td>
+                                                                        <td>{{ $productData['code'] ?? 'Unknown Product' }} - {{ $productData['name'] ?? 'Unknown Product' }}</td>
+                                                                        <td>{{ $items->qty }}</td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    @if($sale->ga->isNotEmpty())
+                                                    <div class="col-md-12">
+                                                        <p><strong>Item Give Away:</strong></p>
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>#</th>
+                                                                    <th>Variant</th>
+                                                                    <th>Qty</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($sale->ga as $key)
+                                                                    @php
+                                                                        // Fetch product data
+                                                                        $productData = $key->getProductDataFromApi($key->product_packaging_id);
+                                                                    @endphp
+                                                                    <tr>
+                                                                        <td>{{ $loop->iteration }}</td>
+                                                                        <td>{{ $productData['code'] ?? 'Unknown Product' }} - {{ $productData['name'] ?? 'Unknown Product' }}</td>
+                                                                        <td>{{ $key->qty }}</td>
+                                                                    </tr>
+                                                                    @if(!$productData)
+                                                                        <tr>
+                                                                            <td colspan="3" class="text-danger">
+                                                                                Product not found for ID: {{ $key->product_packaging_id }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         @endif
