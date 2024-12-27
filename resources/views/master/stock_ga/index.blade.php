@@ -25,8 +25,8 @@
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center">Variant</th>
-                        <th class="text-center">Pcs / Botol</th>
-                        <th class="text-center">Stock</th>
+                        <th class="text-center">Botol</th>
+                        <th class="text-center">Volume</th>
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -89,8 +89,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="qtyInput" class="form-label">Qty</label>
-                        <input type="number" class="form-control" id="qtyInput" name="qty" min="1" placeholder="Masukkan Qty">
+                        <label for="qtyInput" class="form-label">Botol</label>
+                        <input type="number" class="form-control" id="qtyInput" name="botol" min="1" placeholder="Masukkan jumlah botol" required>
                     </div>
                 </form>
             </div>

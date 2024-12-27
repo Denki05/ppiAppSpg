@@ -80,7 +80,7 @@
             <div class="form-group row">
                 <h4>Transaksi :</h4><br>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-success addRow"><i class="fa fa-plus"></i> Tambah</button>
+                    <button type="button" class="btn btn-success" id="openTransaksiModal"><i class="fa fa-plus"></i> Tambah</button>
                 </div>
                 <div class="col-md-12">
                     <div class="table-responsive">
@@ -136,6 +136,36 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 <button type="button" class="btn btn-primary" id="saveGA">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for adding Transaksi item -->
+<div class="modal fade" id="transaksiModal" tabindex="-1" aria-labelledby="transaksiModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transaksiModalLabel">Tambah Item Transaksi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="transaksiForm">
+                    <div class="mb-3">
+                        <label for="transaksiVariantSelect" class="form-label">Variant</label>
+                        <select class="form-control select2" id="transaksiVariantSelect" name="transaksi_variant">
+                            <option value="">Pilih Variant</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transaksiQtyInput" class="form-label">Qty</label>
+                        <input type="number" class="form-control" id="transaksiQtyInput" name="transaksi_qty" min="1" placeholder="Masukkan Qty">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="saveTransaksi">Simpan</button>
             </div>
         </div>
     </div>
@@ -275,31 +305,60 @@ $(document).ready(function () {
         ordering: false,
     });
 
-    // Handle addRow button for Transaksi section
-    $('.addRow').on('click', function () {
-        if (product_data.length === 0) {
-            alert('Data produk belum tersedia. Harap tunggu sebentar.');
+    // Hide the table initially if there is no data
+    const updateTableVisibilityTransaksi = () => {
+        if (transaksiTable.rows().count() === 0) {
+            $('#datatable_transaksi').closest('.table-responsive').hide();
+        } else {
+            $('#datatable_transaksi').closest('.table-responsive').show();
+        }
+    };
+
+    // Initial table visibility check
+    updateTableVisibilityTransaksi();
+
+    // Open modal to add a new transaksi item
+    $('#openTransaksiModal').on('click', function () {
+        $('#transaksiModal').modal('show');
+
+        // Initialize select2 for variant dropdown inside the modal
+        $('#transaksiVariantSelect').select2({
+            dropdownParent: $('#transaksiModal'), // Ensure dropdown appears within modal
+            width: '100%',
+        });
+
+        // Populate the variant dropdown with preloaded product data
+        $('#transaksiVariantSelect').empty();
+        $('#transaksiVariantSelect').append('<option value="">Pilih Variant</option>');
+        product_data.forEach(function (product) {
+            $('#transaksiVariantSelect').append(`<option value="${product.product_id}">${product.code} - ${product.name}</option>`);
+        });
+    });
+
+    // Save transaksi item to the table
+    $('#saveTransaksi').on('click', function () {
+        const variant = $('#transaksiVariantSelect').val(); // Get selected variant ID
+        const variantText = $('#transaksiVariantSelect option:selected').text(); // Get selected variant text
+        const qty = $('#transaksiQtyInput').val(); // Get entered quantity
+
+        // Validation: Ensure fields are not empty
+        if (!variant || !qty) {
+            alert('Harap isi semua data sebelum menyimpan.');
             return;
         }
 
-        var newRow = transaksiTable.row.add([
-            `<select class="form-control transaksi_select" name="transaksi[]">
-                <option value="">Pilih Variant</option>
-                ${product_data.map(function (product) {
-                    return `<option value="${product.id}">${product.code} - ${product.name}</option>`;
-                }).join('')}
-            </select>`,
-            `<input type="number" class="form-control qty_input" name="transaksi_qty[]" min="1" value="500">`,
-            '<button class="btn btn-danger btn-sm delete-row"><i class="fa-solid fa-trash"></i></button>'
-        ]).draw().node();
+        // Add new row to DataTable
+        transaksiTable.row.add([
+            `<input type="hidden" name="transaksi_variant[]" value="${variant}">${variantText}`,
+            `<input type="hidden" name="transaksi_qty[]" value="${qty}">${qty}`,
+            `<button class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>`,
+        ]).draw();
 
-        // Add counter value (row index) dynamically
-        // $(newRow).find('td:first').text(transaksiTable.rows().count());
+        updateTableVisibilityTransaksi();
 
-        // Initialize select2 for the newly added variant dropdown
-        $(newRow).find('.transaksi_select').select2({
-            width: '100%',
-        });
+        // Reset form and close modal
+        $('#transaksiForm')[0].reset();
+        $('#transaksiModal').modal('hide');
     });
 
     // Delete row functionality for Transaksi table

@@ -37,7 +37,7 @@ class StockGaController extends Controller
         $request->validate([
             'variant' => 'required',
             'brand' => 'required|string',
-            'qty' => 'required|numeric|min:1',
+            'botol' => 'required|numeric|min:1',
         ]);
 
         // Check if the combination of product_id and brand already exists
@@ -54,16 +54,16 @@ class StockGaController extends Controller
 
         // calculated pcs if input qty
         $default_ml_pcs = 45;
-        $get_pcs = $request->qty / $default_ml_pcs;
+        $get_volume = $request->botol * $default_ml_pcs;
 
-        // dd($get_pcs);
+        // dd($get_volume);
 
         // Save the data to the database
         $stock = new StockGa();
         $stock->product_id = $request->variant;
         $stock->brand_name = $request->brand;
-        $stock->qty = $request->qty;
-        $stock->pcs = $get_pcs;
+        $stock->qty = $get_volume;
+        $stock->pcs = $request->botol;
         $stock->created_by = Auth::id();
         $stock->save();
 
@@ -93,16 +93,16 @@ class StockGaController extends Controller
         ]);
 
         // Add the additional stock
-        $stock->qty += $request->additional_stock;
+        $stock->pcs += $request->additional_stock;
 
         // Calculate total pieces and cartons
-        $totalPieces = $stock->qty;
+        $totalPieces = $stock->pcs;
         $cartons = intdiv($totalPieces, 45); // Calculate full cartons
-        $remainingPieces = $totalPieces / 45; // Calculate leftover pieces
+        $remainingPieces = $totalPieces * 45; // Calculate leftover pieces
         // dd($remainingPieces);
 
         // Update the stock record
-        $stock->pcs = $remainingPieces; // Store the remaining pieces
+        $stock->qty = $remainingPieces; // Store the remaining pieces
         $stock->save();
 
         return response()->json([
