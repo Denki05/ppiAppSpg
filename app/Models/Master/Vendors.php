@@ -19,6 +19,8 @@ class Vendors extends Model
         'kabupaten_id',
         'kecamatan_id',
         'kelurahan_id',
+        'shift_start',
+        'shift_end',
         'created_by',
         'updated_by',
     ];

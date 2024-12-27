@@ -65,7 +65,7 @@
                             <thead>
                                 <tr>
                                     <th style="min-width: 150px;">Variant</th>
-                                    <th style="min-width: 60px;">Qty</th>
+                                    <th style="min-width: 60px;">Pcs / Botol</th>
                                     <th style="min-width: 40px;">Action</th>
                                 </tr>
                             </thead>
@@ -88,7 +88,7 @@
                             <thead>
                                 <tr>
                                     <th style="min-width: 150px;">Variant</th>
-                                    <th style="min-width: 60px;">Qty</th>
+                                    <th style="min-width: 60px;">Pcs / Botol</th>
                                     <th style="min-width: 40px;">Action</th>
                                 </tr>
                             </thead>
@@ -128,7 +128,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="qtyInput" class="form-label">Qty</label>
+                        <label for="qtyInput" class="form-label">Pcs / Botol</label>
                         <input type="number" class="form-control" id="qtyInput" name="qty" min="1" placeholder="Masukkan Qty">
                     </div>
                 </form>
@@ -331,15 +331,15 @@ $(document).ready(function () {
         $('#transaksiVariantSelect').empty();
         $('#transaksiVariantSelect').append('<option value="">Pilih Variant</option>');
         product_data.forEach(function (product) {
-            $('#transaksiVariantSelect').append(`<option value="${product.product_id}">${product.code} - ${product.name}</option>`);
+            $('#transaksiVariantSelect').append(`<option value="${product.id}">${product.code} - ${product.name}</option>`);
         });
     });
 
     // Save transaksi item to the table
     $('#saveTransaksi').on('click', function () {
-        const variant = $('#transaksiVariantSelect').val(); // Get selected variant ID
-        const variantText = $('#transaksiVariantSelect option:selected').text(); // Get selected variant text
-        const qty = $('#transaksiQtyInput').val(); // Get entered quantity
+        let variant = $('#transaksiVariantSelect').val(); // Get selected variant ID
+        let variantText = $('#transaksiVariantSelect option:selected').text(); // Get selected variant text
+        let qty = $('#transaksiQtyInput').val(); // Get entered quantity
 
         // Validation: Ensure fields are not empty
         if (!variant || !qty) {
@@ -349,7 +349,7 @@ $(document).ready(function () {
 
         // Add new row to DataTable
         transaksiTable.row.add([
-            `<input type="hidden" name="transaksi_variant[]" value="${variant}">${variantText}`,
+            `<input type="hidden" name="transaksi[]" value="${variant}">${variantText}`,
             `<input type="hidden" name="transaksi_qty[]" value="${qty}">${qty}`,
             `<button class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>`,
         ]).draw();

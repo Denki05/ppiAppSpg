@@ -129,4 +129,9 @@ class VendorController extends Controller
 
         return redirect()->route('master.customer.index')->with('error', 'Vendor tidak ditemukan!.');
     }
+
+    public function timeShift($id)
+    {
+        
+    }
 }

@@ -35,10 +35,12 @@ class SalesController extends Controller
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
+        $currentDate = Carbon::now()->toDateString();
 
         // Filter data untuk bulan dan tahun saat ini
         $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
                                 ->whereYear('tanggal_order', $currentYear)
+                                ->whereDate('tanggal_order', $currentDate)
                                 ->where('status', 2)
                                 ->get();
 
@@ -182,6 +184,7 @@ class SalesController extends Controller
 
             // Handle main transaction items
             foreach ($request->transaksi as $index => $transaksi) {
+                // dd($transaksi);
                 SalesOrderItem::create([
                     'so_id' => $penjualan->id,
                     'product_id' => $transaksi,
@@ -194,7 +197,7 @@ class SalesController extends Controller
             DB::commit();
 
             // Redirect with success message
-            return redirect()->back()->with('success', 'Jurnal berhasil di input.');
+            return redirect()->route('home')->with('success', 'Jurnal berhasil di input.');
         } catch (\Exception $e) {
             // Rollback the transaction in case of error
             DB::rollback();
