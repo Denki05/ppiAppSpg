@@ -162,11 +162,20 @@ class SalesController extends Controller
                     SalesOrderGa::create([
                         'so_id' => $penjualan->id,
                         'product_packaging_id' => $variant,
-                        'qty' => $request->qty[$index],
+                        'pcs' => $request->qty[$index],
                     ]);
 
-                    $stock->decrement('qty', $request->qty[$index]);
-                    $stock->pcs = $stock->qty / 45; // Update `pcs` field accordingly
+                    // Calculate stock volume
+                    $stockBefore = $stock->qty;
+                    $stockGetVolume = $request->qty[$index] * 45;
+                    $calculateStock = $stockBefore - $stockGetVolume;
+                    $stock->qty = $calculateStock;
+
+                    // Calculate stock pcs
+                    $stockBeforePcs = $stock->pcs;
+                    $stockGetPcs = $request->qty[$index];
+                    $calculatePcs = $stockBeforePcs - $stockGetPcs;
+                    $stock->pcs = $calculatePcs;
                     $stock->save();
                 }
             }
@@ -185,7 +194,7 @@ class SalesController extends Controller
             DB::commit();
 
             // Redirect with success message
-            return redirect()->back()->with('success', 'Transaction data has been successfully saved.');
+            return redirect()->back()->with('success', 'Jurnal berhasil di input.');
         } catch (\Exception $e) {
             // Rollback the transaction in case of error
             DB::rollback();
@@ -214,17 +223,25 @@ class SalesController extends Controller
         $data['sales_items'] = SalesOrderItem::where('so_id', $id)->get();
         $data['sales_ga'] = SalesOrderGa::where('so_id', $id)->get();
 
+        $stockGaItems = StockGa::where('brand_name', $sales->brand_name)->get();
+        $data['stock_ga'] = $stockGaItems->map(function ($item) {
+            $productData = $item->getProductDataFromApi($item->product_id);
+            return [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'name' => $productData['name'] ?? null,
+                'code' => $productData['code'] ?? null,
+            ];
+        });
+
         // Pass the data to the view
         return view('penjualan.edit', $data);
     }
 
     public function update(Request $request, $id)
     {
-        // Validate form input
         $validated = $request->validate([
-            'customer_dom' => 'nullable|exists:master_customer,id',
-            'customer_non_dom' => 'nullable|exists:master_customer,id',
-            'customerCash' => 'nullable|numeric|min:0',
+            'customer' => 'nullable|exists:master_customer,id',
             'brand_name' => 'required|string',
             'variant' => 'nullable|array',
             'qty' => 'nullable|array',
@@ -234,89 +251,89 @@ class SalesController extends Controller
             'transaksi_qty.*' => 'required|numeric|min:1',
         ]);
 
-        // Start database transaction
         DB::beginTransaction();
 
         try {
-            // Find the sales order by its ID
+            // Update SalesOrder
             $penjualan = SalesOrder::findOrFail($id);
-
-            // // Determine customer type and value
-            // $customer_id = $request->customer_dom ?? $request->customer_non_dom ?? null;
-            // $customer_type = !empty($request->customerCash) ? 1 : 0;
-
-            // if (!$customer_id && $customer_type === 0) {
-            //     return redirect()->back()->withErrors(['error' => 'You must select a customer or provide cash value.']);
-            // }
-
-            // Update penjualan index
             $penjualan->customer_id = $request->customer;
             $penjualan->brand_name = $request->brand_name;
             $penjualan->updated_by = Auth::id();
             $penjualan->save();
 
-            // Update penjualan GA (optional)
             // Restore the previous stock before deleting SalesOrderGa
             $default_ml_pcs = 45;
             $previousSalesGa = SalesOrderGa::where('so_id', $penjualan->id)->get();
             foreach ($previousSalesGa as $salesGa) {
                 $stock = StockGa::where('product_id', $salesGa->product_packaging_id)->first();
                 if ($stock) {
-                    $stock->qty += $salesGa->qty;
-                    $get_pcs = $stock->qty / $default_ml_pcs;
-                    $stock->pcs = $get_pcs;
+                    // calculate stock pcs
+                    $getStockGaPcs = $salesGa->pcs;
+                    $stock->pcs += $getStockGaPcs;
+
+                    // calculate stock volume
+                    $getStockGaVolume = $getStockGaPcs * $default_ml_pcs;
+                    $stock->qty += $getStockGaVolume;
+
                     $stock->save();
                 }
             }
 
-            // Delete existing SalesOrderGa records
             SalesOrderGa::where('so_id', $penjualan->id)->delete();
 
-            // Add new SalesOrderGa records
-            if (!empty($request->variant) && !empty($request->qty)) {
-                foreach ($request->variant as $index => $variant) {
-                    $stock = StockGa::where('product_id', $variant)->first();
+            if ($request->has('variant') && $request->has('qty')) {
+                foreach ($request->variant as $index => $variantId) {
+                    $stock = StockGa::where('product_id', $variantId)->first();
+                    // dd($stock->qty);
 
-                    if (!$stock || $stock->qty < $request->qty[$index]) {
+                    if (!$stock || $stock->qty < ($request->qty[$index] * $default_ml_pcs)) {
                         DB::rollback();
-                        return redirect()->back()->withErrors(['error' => 'Stock variant Give Away: ' . $variant . ' tidak mencukupi!']);
+                        return redirect()->back()->withErrors(['error' => 'Insufficient stock for variant: ' . $variantId]);
                     }
 
                     SalesOrderGa::create([
                         'so_id' => $penjualan->id,
-                        'product_packaging_id' => $variant,
-                        'qty' => $request->qty[$index],
+                        'product_packaging_id' => $variantId,
+                        'pcs' => $request->qty[$index],
                     ]);
 
-                    // Reduce stock
-                    $stock->qty -= $request->qty[$index];
-                    $stock->pcs = $stock->qty / 45;
+                    // Calculate stock volume
+                    $stockBefore = $stock->qty;
+                    $stockGetVolume = $request->qty[$index] * 45;
+                    $calculateStock = $stockBefore - $stockGetVolume;
+                    $stock->qty = $calculateStock;
+
+                    // dd($calculateStock);
+
+                    // Calculate stock pcs
+                    $stockBeforePcs = $stock->pcs;
+                    $stockGetPcs = $request->qty[$index];
+                    $calculatePcs = $stockBeforePcs - $stockGetPcs;
+                    $stock->pcs = $calculatePcs;
+
+                    // dd($calculatePcs);
                     $stock->save();
                 }
             }
 
-            // Update Transaksi
+            // Update SalesOrderItem
             SalesOrderItem::where('so_id', $penjualan->id)->delete();
-            foreach ($request->transaksi as $index => $transaksi) {
+
+            foreach ($request->transaksi as $index => $productId) {
                 SalesOrderItem::create([
                     'so_id' => $penjualan->id,
-                    'product_id' => $transaksi,
+                    'product_id' => $productId,
                     'qty' => $request->transaksi_qty[$index],
+                    'unit_weight' => 1,
                 ]);
             }
 
-            // Commit the transaction
             DB::commit();
-
-            // Redirect with success message
-            return redirect()->back()->with('success', 'Data transaksi telah diperbarui.');
+            return redirect()->back()->with('success', 'Data updated successfully.');
         } catch (\Exception $e) {
-            dd($e);
-            // Rollback the transaction in case of error
             DB::rollback();
-
-            // Redirect with error message
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui data transaksi.');
+            Log::error('Error updating SalesOrder', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'An error occurred while updating the data.');
         }
     }
 

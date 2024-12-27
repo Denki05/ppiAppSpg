@@ -12,7 +12,7 @@ class SalesOrderGa extends Model
     protected $fillable =[
         'so_id', 
         'product_packaging_id', 
-        'qty',
+        'pcs',
     ];
 
     public function so(){

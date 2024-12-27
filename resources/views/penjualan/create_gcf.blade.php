@@ -65,7 +65,7 @@
                             <thead>
                                 <tr>
                                     <th style="min-width: 150px;">Variant</th>
-                                    <th style="min-width: 60px;">Qty</th>
+                                    <th style="min-width: 60px;">Pcs / Botol</th>
                                     <th style="min-width: 40px;">Action</th>
                                 </tr>
                             </thead>
@@ -128,8 +128,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="qtyInput" class="form-label">Qty</label>
-                        <input type="number" class="form-control" id="qtyInput" name="qty" min="1" placeholder="Masukkan Qty">
+                        <label for="qtyInput" class="form-label">Pcs</label>
+                        <input type="number" class="form-control" id="qtyInput" name="qty" min="1" placeholder="Masukkan jumlah item give away">
                     </div>
                 </form>
             </div>

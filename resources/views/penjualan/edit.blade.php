@@ -62,7 +62,7 @@
                             <thead>
                                 <tr>
                                     <th style="min-width: 150px;">Variant</th>
-                                    <th style="min-width: 60px;">Qty</th>
+                                    <th style="min-width: 60px;">Pcs / Botol</th>
                                     <th style="min-width: 40px;">Action</th>
                                 </tr>
                             </thead>
@@ -74,11 +74,11 @@
                                     @endphp
                                     <tr>
                                         <td>
-                                            <input type="hidden" name="ga_variant[]" value="{{ $ga->product_packaging_id }}">
+                                            <input type="hidden" name="variant[]" value="{{ $ga->product_packaging_id }}">
                                             {{ $productData['code'] ?? 'Unknown Product' }} - {{ $productData['name'] ?? 'Unknown Product' }}
                                         </td>
                                         <td>
-                                            <input type="number" name="ga_qty[]" class="form-control" value="{{ $ga->qty }}" min="1">
+                                            <input type="number" name="qty[]" class="form-control" value="{{ $ga->pcs }}" min="1">
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-danger delete-row"><i class="fa fa-trash"></i></button>
@@ -155,12 +155,16 @@
                         <label for="variantSelect" class="form-label">Variant</label>
                         <select class="form-control select2" id="variantSelect" name="variant">
                             <option value="">Pilih Variant</option>
-                            <!-- Variant options will be populated via JavaScript -->
+                            @foreach ($stock_ga as $item)
+                                <option value="{{ $item['product_id'] }}">
+                                    {{ $item['code'] }} - {{ $item['name'] }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="qtyInput" class="form-label">Qty</label>
-                        <input type="number" class="form-control" id="qtyInput" name="qty" min="1" placeholder="Masukkan Qty">
+                        <label for="qtyInput" class="form-label">Pcs / Botol</label>
+                        <input type="number" class="form-control" id="qtyInput" name="qty" min="1" placeholder="Masukkan jumlah pcs / botol">
                     </div>
                 </form>
             </div>
@@ -205,7 +209,6 @@
         bInfo: false,
         searching: false,
         ordering: false,
-        order: [[0, 'desc']],
     });
 
     // Hide the table initially if there is no data
@@ -224,30 +227,20 @@
     $('#openGAModal').on('click', function () {
         $('#gaModal').modal('show');
 
-        // Populate variant options in the modal if product data is available
-        if (product_data.length > 0) {
-            const variantSelect = $('#variantSelect');
-            variantSelect.empty().append('<option value="">Pilih Variant</option>');
-            product_data.forEach(product => {
-                variantSelect.append(`<option value="${product.id}">${product.code} - ${product.name}</option>`);
-            });
-
-            // Initialize Select2 for variant dropdown in modal
-            variantSelect.select2({
-                dropdownParent: $('#gaModal'), // Ensure dropdown is inside the modal
-                width: '100%',
-            });
-        } else {
-            alert('Data produk belum tersedia. Harap tunggu sebentar.');
-        }
+        // Initialize select2 for variant dropdown inside the modal
+        $('#variantSelect').select2({
+            dropdownParent: $('#gaModal'), // Ensure dropdown appears within modal
+            width: '100%',
+        });
     });
 
     // Save give away item to the table
     $('#saveGA').on('click', function () {
-        const variant = $('#variantSelect').val();
-        const variantText = $('#variantSelect option:selected').text();
-        const qty = $('#qtyInput').val();
+        const variant = $('#variantSelect').val(); // Get selected variant ID
+        const variantText = $('#variantSelect option:selected').text(); // Get selected variant text
+        const qty = $('#qtyInput').val(); // Get entered quantity
 
+        // Validation: Ensure fields are not empty
         if (!variant || !qty) {
             alert('Harap isi semua data sebelum menyimpan.');
             return;
@@ -257,13 +250,13 @@
         gaTable.row.add([
             `<input type="hidden" name="variant[]" value="${variant}">${variantText}`,
             `<input type="hidden" name="qty[]" value="${qty}">${qty}`,
-            '<button class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>',
+            `<button class="btn btn-danger btn-sm delete-row"><i class="fa fa-trash"></i></button>`,
         ]).draw();
 
         // Update table visibility
         updateTableVisibility();
 
-        // Reset the modal form and close the modal
+        // Reset form and close modal
         $('#gaForm')[0].reset();
         $('#gaModal').modal('hide');
     });
@@ -272,7 +265,7 @@
     $(document).on('click', '.delete-row', function () {
         gaTable.row($(this).closest('tr')).remove().draw();
 
-        // Update table visibility after row deletion
+        // Update table visibility after deleting a row
         updateTableVisibility();
     });
 
