@@ -35,7 +35,7 @@
 
             <div class="col-md-6">
                 <label for="phone" class="form-label">Owner</label>
-                <input type="text" class="form-control" id="owner" name="owner" required>
+                <input type="text" class="form-control" id="owner" name="owner">
             </div>
 
             <div class="col-md-6">

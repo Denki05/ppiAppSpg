@@ -41,7 +41,6 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
-            'owner' => 'required|string|max:255',
         ]);
 
         Customer::create([
@@ -88,11 +87,6 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
-            'owner' => 'required|string|max:255',
-            'provinsi' => 'required',
-            'kota' => 'required',
-            'kecamatan' => 'required',
-            'kelurahan' => 'required',
         ]);
 
         $customer = Customer::findOrFail($id);
