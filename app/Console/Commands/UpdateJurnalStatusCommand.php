@@ -12,16 +12,17 @@ class UpdateJurnalStatusCommand extends Command
 
     public function handle()
     {
-        $tanggalKemarin = now()->subDay()->toDateString(); // Mendapatkan tanggal kemarin
+        $tanggalKemarin = now()->subDay()->startOfDay()->toDateString(); // Mendapatkan tanggal kemarin
 
         // Ambil semua jurnal yang masih "review" dan belum ada penanganan sampai kemarin
         $jurnals = SalesOrder::where('status', '2')
-                         ->whereDate('tanggal_order', '<', $tanggalKemarin)
+                         ->whereDate('tanggal_order', $tanggalKemarin)
                          ->get();
 
         foreach ($jurnals as $jurnal) {
             // Ubah status jurnal menjadi "settle"
-            $jurnal->update(['status' => '3']);
+            $jurnal->status = '3';
+            $jurnal->save();
 
             // Opsional: Log perubahan
             \Log::info("Jurnal ID {$jurnal->id} status diubah menjadi 'settle'.");

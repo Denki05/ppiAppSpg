@@ -51,10 +51,12 @@ class SalesController extends Controller
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
+        $currentDate = Carbon::now()->toDateString();
 
         // Filter data untuk bulan dan tahun saat ini
         $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
                                 ->whereYear('tanggal_order', $currentYear)
+                                ->whereDate('tanggal_order', $currentDate)
                                 ->where('status', 3)
                                 ->get();
 
@@ -401,54 +403,66 @@ class SalesController extends Controller
     }
 
     public function checkCustomerDOM()
-{
-    $user = User::find(Auth::id());
+    {
+        $user = User::find(Auth::id());
 
-    $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
-        ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-        ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-        ->where('master_customer.provinsi_id', $user->provinsi_id)
-        ->where('master_customer.kabupaten_id', $user->kabupaten_id)
-        ->select(
-            'master_customer.id as customer_id',
-            'master_customer.nama as customer_nama', 
-            'districts.name as customer_kecamatan',
-            'regencies.name as customer_kota', 
-            'provinces.name as customer_provinsi'
-        )
-        ->get();
+        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
+            ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
+            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
+            ->where('master_customer.provinsi_id', $user->provinsi_id)
+            ->where('master_customer.kabupaten_id', $user->kabupaten_id)
+            ->select(
+                'master_customer.id as customer_id',
+                'master_customer.nama as customer_nama', 
+                'districts.name as customer_kecamatan',
+                'regencies.name as customer_kota', 
+                'provinces.name as customer_provinsi'
+            )
+            ->get();
 
-    $cityPlaceholder = $customers->isNotEmpty() ? $user->kabupaten->name : 'Domisili';
+        $cityPlaceholder = $customers->isNotEmpty() ? $user->kabupaten->name : 'Domisili';
 
-    return response()->json([
-        'customers' => $customers,
-        'placeholder' => "PILIH $cityPlaceholder"
-    ]);
-}
+        return response()->json([
+            'customers' => $customers,
+            'placeholder' => "PILIH $cityPlaceholder"
+        ]);
+    }
 
-public function checkCustomerOUTDOM()
-{
-    $user = User::find(Auth::id());
+    public function checkCustomerOUTDOM()
+    {
+        $user = User::find(Auth::id());
 
-    $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
-        ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-        ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-        ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
-        ->select(
-            'master_customer.id as customer_id',
-            'master_customer.nama as customer_nama',
-            'districts.name as customer_kecamatan',
-            'regencies.name as customer_kota',
-            'provinces.name as customer_provinsi'
-        )
-        ->get();
+        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
+            ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
+            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
+            ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+            ->select(
+                'master_customer.id as customer_id',
+                'master_customer.nama as customer_nama',
+                'districts.name as customer_kecamatan',
+                'regencies.name as customer_kota',
+                'provinces.name as customer_provinsi'
+            )
+            ->get();
 
-    $cityPlaceholder = $customers->isNotEmpty() ? "LUAR {$user->kabupaten->name}" : 'Luar Domisili';
+        $cityPlaceholder = $customers->isNotEmpty() ? "LUAR {$user->kabupaten->name}" : 'Luar Domisili';
 
-    return response()->json([
-        'customers' => $customers,
-        'placeholder' => "PILIH $cityPlaceholder"
-    ]);
-}
+        return response()->json([
+            'customers' => $customers,
+            'placeholder' => "PILIH $cityPlaceholder"
+        ]);
+    }
 
+
+    public function cek_jurnal()
+    {
+        $tanggalKemarin = now()->subDay()->startOfDay()->toDateString(); // Mendapatkan tanggal kemarin
+
+        // Ambil satu jurnal yang masih "review" dan belum ada penanganan sampai kemarin
+        $jurnal = SalesOrder::where('status', '2')
+                         ->whereDate('tanggal_order', $tanggalKemarin)
+                         ->first();
+
+        // dd($jurnal);
+    }
 }

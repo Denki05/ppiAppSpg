@@ -62,6 +62,7 @@ Route::post('/penjualan/settel/{id}', [SalesController::class, 'settel'])->name(
 Route::delete('/penjualan/{id}', [SalesController::class, 'destroy'])->name('penjualan.destroy');
 Route::get('/penjualan/checkCustomerDOM', [SalesController::class, 'checkCustomerDOM'])->name('penjualan.checkCustomerDOM');
 Route::get('/penjualan/checkCustomerOUTDOM', [SalesController::class, 'checkCustomerOUTDOM'])->name('penjualan.checkCustomerOUTDOM');
+Route::get('/penjualan/cek_jurnal', [SalesController::class, 'cek_jurnal'])->name('penjualan.cek_jurnal');
 
 // Customer
 Route::get('/master/customer', [CustomerController::class, 'index'])->name('master.customer.index');

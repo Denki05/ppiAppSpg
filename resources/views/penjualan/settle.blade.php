@@ -29,6 +29,9 @@
 
     <div class="row justify-content-center">
         <div class="col-md-12">
+            <!-- <a class="btn btn-success" href="{{ route('penjualan.cek_jurnal') }}" role="button">
+                <i class="fa fa-check" aria-hidden="true"></i> Cek
+            </a> -->
             <br>
             <br>
 
