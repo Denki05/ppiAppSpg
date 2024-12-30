@@ -20,42 +20,42 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="name" class="form-label">Nama Toko</label>
-                <input type="text" class="form-control" value="{{ $customer->nama }}" readonly>
+                <input type="text" class="form-control" value="{{ $customer->nama ?? '-' }}" readonly>
             </div>
 
             <div class="col-md-6">
                 <label for="alamat" class="form-label">Alamat Toko</label>
-                <input type="text" class="form-control" value="{{ $customer->alamat }}" readonly>
+                <input type="text" class="form-control" value="{{ $customer->alamat ?? '-' }}" readonly>
             </div>
 
             <div class="col-md-6">
                 <label for="phone" class="form-label">Telepon</label>
-                <input type="text" class="form-control" value="{{ $customer->phone }}" readonly>
+                <input type="text" class="form-control" value="{{ $customer->phone ?? '-' }}" readonly>
             </div>
 
             <div class="col-md-6">
                 <label for="phone" class="form-label">Owner</label>
-                <input type="text" class="form-control" value="{{ $customer->owner }}" readonly>
+                <input type="text" class="form-control" value="{{ $customer->owner ?? '-' }}" readonly>
             </div>
 
             <div class="col-md-6">
             <label for="provinsi" class="form-label">Provinsi</label>
-            <input type="text" class="form-control" value="{{ $customer->provinsi->name }}" readonly>
+            <input type="text" class="form-control" value="{{ $customer->provinsi->name ?? '-' }}" readonly>
         </div>
 
         <div class="col-md-6">
             <label for="kota" class="form-label">Kota</label>
-            <input type="text" class="form-control" value="{{ $customer->kabupaten->name }}" readonly>
+            <input type="text" class="form-control" value="{{ $customer->kabupaten->name ?? '-' }}" readonly>
         </div>
 
         <div class="col-md-6">
             <label for="kecamatan" class="form-label">Kecamatan</label>
-            <input type="text" class="form-control" value="{{ $customer->kecamatan->name }}" readonly>
+            <input type="text" class="form-control" value="{{ $customer->kecamatan->name ?? '-' }}" readonly>
         </div>
 
         <div class="col-md-6">
             <label for="kelurahan" class="form-label">Kelurahan</label>
-            <input type="text" class="form-control" value="{{ $customer->kelurahan->name }}" readonly>
+            <input type="text" class="form-control" value="{{ $customer->kelurahan->name ?? '-' }}" readonly>
         </div>
         
         <div class="mt-4">
