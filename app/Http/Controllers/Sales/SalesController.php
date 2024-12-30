@@ -47,7 +47,7 @@ class SalesController extends Controller
         return view('penjualan.review', $data);
     }
 
-    public function settle(Request $request)
+    public function settle_view(Request $request)
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
