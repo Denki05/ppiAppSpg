@@ -155,7 +155,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('penjualan.settle') }}">
+                                <a class="nav-link" href="{{ route('penjualan.settle_view') }}">
                                     <i class="fa-solid fa-check"></i> Settel
                                 </a>
                             </li>
