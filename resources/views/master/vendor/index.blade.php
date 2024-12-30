@@ -53,48 +53,48 @@
                                 <div class="modal-dialog modal-xl">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="vendorModalLabel{{ $vendor->id }}">Vendor Detail {{ $vendor->nama }}</h5>
+                                            <h5 class="modal-title" id="vendorModalLabel{{ $vendor->id }}">Vendor Detail {{ $vendor->nama  ?? '-'}}</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Nama</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->nama }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->nama ?? '-'}}" readonly>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Alamat</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->alamat }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->alamat ?? '-'}}" readonly>
                                                 </div>
                                             </div>
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Telepone</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->phone }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->phone ?? '-'}}" readonly>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Owner</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->owner }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->owner ?? '-'}}" readonly>
                                                 </div>
                                             </div>
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Provinsi</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->provinsi->name }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->provinsi->name ?? '-'}}" readonly>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Kota</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->kabupaten->name }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->kabupaten->name ?? '-'}}" readonly>
                                                 </div>
                                             </div>
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Kecamatan</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->kecamatan->name }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->kecamatan->name ?? '-'}}" readonly>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label for="name" class="form-label">Kelurahan</label>
-                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->kelurahan->name }}" readonly>
+                                                    <input type="text" name="name" id="name" class="form-control" value="{{ $vendor->kelurahan->name ?? '-'}}" readonly>
                                                 </div>
                                             </div>
                                         </div>
