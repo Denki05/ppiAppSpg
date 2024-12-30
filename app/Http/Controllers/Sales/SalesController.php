@@ -54,7 +54,7 @@ class SalesController extends Controller
 
         // Check if the logged-in user has the role 'dev' or 'admin_sales'
         $user = Auth::user();
-        if ($user->hasRole('dev') || $user->hasRole('admin_sales')) {
+        if ($user->role === 'dev' || $user->role === 'admin') {
             // Filter data for the current month and year without date
             $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
                                     ->whereYear('tanggal_order', $currentYear)
