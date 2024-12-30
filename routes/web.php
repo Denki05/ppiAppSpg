@@ -51,7 +51,7 @@ Route::get('/admin/users/{kecamatanID}/getKelurahan', [UserManageController::cla
 // Penjualan
 Route::get('/penjualan', [SalesController::class, 'index'])->name('penjualan.index');
 Route::get('/penjualan/review', [SalesController::class, 'review'])->name('penjualan.review');
-Route::get('/penjualan/settle_view', [SalesController::class, 'settle_view'])->name('penjualan.settle_view');
+Route::get('/penjualan/settle', [SalesController::class, 'settle'])->name('penjualan.settle');
 Route::get('/penjualan', [SalesController::class, 'index'])->name('penjualan.index');
 Route::get('/penjualan/create_senses', [SalesController::class, 'create_senses'])->name('penjualan.create_senses');
 Route::get('/penjualan/create_gcf', [SalesController::class, 'create_gcf'])->name('penjualan.create_gcf');
