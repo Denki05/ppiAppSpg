@@ -53,7 +53,7 @@
                             <td class="text-center">{{ $sale->brand_name }}</td>
                             <td class="text-center">
                                 @if($sale->type == 0)
-                                    {{ $sale->customer->nama }}, {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
+                                    {{ $sale->customer->nama }}, {{ $sale->customer->kecamatan->name ?? '-' }} - {{ $sale->customer->kabupaten->name ?? '-' }} - {{ $sale->customer->provinsi->name ?? '-' }}
                                 @else
                                     CASH
                                 @endif
