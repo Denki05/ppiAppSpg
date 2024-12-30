@@ -51,14 +51,24 @@ class SalesController extends Controller
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
-        $currentDate = Carbon::now()->toDateString();
 
-        // Filter data untuk bulan dan tahun saat ini
-        $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
-                                ->whereYear('tanggal_order', $currentYear)
-                                ->whereDate('tanggal_order', $currentDate)
-                                ->where('status', 3)
-                                ->get();
+        // Check if the logged-in user has the role 'dev' or 'admin_sales'
+        $user = Auth::user();
+        if ($user->hasRole('dev') || $user->hasRole('admin_sales')) {
+            // Filter data for the current month and year without date
+            $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
+                                    ->whereYear('tanggal_order', $currentYear)
+                                    ->where('status', 3)
+                                    ->get();
+        } else {
+            // Filter data for the current month, year, and date
+            $currentDate = Carbon::now()->toDateString();
+            $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
+                                    ->whereYear('tanggal_order', $currentYear)
+                                    ->whereDate('tanggal_order', $currentDate)
+                                    ->where('status', 3)
+                                    ->get();
+        }
 
         return view('penjualan.settle', $data);
     }
