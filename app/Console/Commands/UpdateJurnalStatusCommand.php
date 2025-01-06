@@ -22,6 +22,7 @@ class UpdateJurnalStatusCommand extends Command
         foreach ($jurnals as $jurnal) {
             // Ubah status jurnal menjadi "settle"
             $jurnal->status = '3';
+            $jurnal->settel_by = '1'; // Setel by AUTO
             $jurnal->save();
 
             // Opsional: Log perubahan

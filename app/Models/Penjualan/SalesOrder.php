@@ -16,7 +16,8 @@ class SalesOrder extends Model
         'tanggal_order',
         'brand', 
         'customer_id', 
-        'status'
+        'status',
+        'settel_by'
     ];
 
     const STATUS = [
@@ -30,6 +31,11 @@ class SalesOrder extends Model
     const TYPE = [
     	0 => 'CUSTOMER',
     	1 => 'CASH',
+    ];
+
+    const SETTEL_BY = [
+    	0 => 'USER',
+    	1 => 'AUTO',
     ];
 
     public function status()

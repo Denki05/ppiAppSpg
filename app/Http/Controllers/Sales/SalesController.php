@@ -360,6 +360,7 @@ class SalesController extends Controller
 
             // Update the sales order status to settled
             $sales->status = 3;
+            $sales->settel_by = 0; // Assuming 0 is for USER
             $sales->updated_by = Auth::user()->id;
             $sales->save();
 
