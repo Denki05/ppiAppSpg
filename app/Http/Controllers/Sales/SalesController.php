@@ -357,7 +357,8 @@ class SalesController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Data updated successfully.');
+            // return redirect()->back()->with('success', 'Data updated successfully.');
+            return redirect()->route('home')->with('success', 'Jurnal berhasil di input.');
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error updating SalesOrder', ['error' => $e->getMessage()]);
@@ -418,7 +419,8 @@ class SalesController extends Controller
             $sales_item->update(['deleted_at' => now()]);
 
             // Redirect back with success message
-            return redirect()->route('penjualan.index')->with('success', 'Jurnal berhasil di hapus.');
+            // return redirect()->route('penjualan.index')->with('success', 'Jurnal berhasil di hapus.');
+            return redirect()->route('home')->with('success', 'Jurnal berhasil di hapus.');
 
         } catch (\Exception $e) {
             // Handle the error and redirect back with error message
@@ -478,15 +480,15 @@ class SalesController extends Controller
     }
 
 
-    public function cek_jurnal()
-    {
-        $tanggalKemarin = now()->subDay()->startOfDay()->toDateString(); // Mendapatkan tanggal kemarin
+    // public function cek_jurnal()
+    // {
+    //     $tanggalKemarin = now()->subDay()->startOfDay()->toDateString(); // Mendapatkan tanggal kemarin
 
-        // Ambil satu jurnal yang masih "review" dan belum ada penanganan sampai kemarin
-        $jurnal = SalesOrder::where('status', '2')
-                         ->whereDate('tanggal_order', $tanggalKemarin)
-                         ->first();
+    //     // Ambil satu jurnal yang masih "review" dan belum ada penanganan sampai kemarin
+    //     $jurnal = SalesOrder::where('status', '2')
+    //                      ->whereDate('tanggal_order', $tanggalKemarin)
+    //                      ->first();
 
-        // dd($jurnal);
-    }
+    //     // dd($jurnal);
+    // }
 }
