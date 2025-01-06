@@ -17,7 +17,9 @@ class SalesOrder extends Model
         'brand', 
         'customer_id', 
         'status',
-        'settel_by'
+        'settel_by',
+        'created_by',
+        'updated_by',
     ];
 
     const STATUS = [

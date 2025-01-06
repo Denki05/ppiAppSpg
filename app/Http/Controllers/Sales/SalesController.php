@@ -36,13 +36,25 @@ class SalesController extends Controller
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
         $currentDate = Carbon::now()->toDateString();
+        $user = Auth::user();
 
-        // Filter data untuk bulan dan tahun saat ini
-        $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
-                                ->whereYear('tanggal_order', $currentYear)
-                                ->whereDate('tanggal_order', $currentDate)
-                                ->where('status', 2)
-                                ->get();
+        // Check if the logged-in user has the role 'dev' or 'admin_sales'
+        if ($user->role === 'dev' || $user->role === 'admin') {
+            // Filter data untuk bulan dan tahun saat ini
+            $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
+                ->whereYear('tanggal_order', $currentYear)
+                ->whereDate('tanggal_order', $currentDate)
+                ->where('status', 2)
+                ->get();
+        } else {
+            // Filter data berdasarkan user provinsi dan kabupaten
+            $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
+                                    ->whereYear('tanggal_order', $currentYear)
+                                    ->whereDate('tanggal_order', $currentDate)
+                                    ->where('status', 2)
+                                    ->where('created_by', $user->id)
+                                    ->get();
+        }
 
         return view('penjualan.review', $data);
     }
@@ -51,9 +63,8 @@ class SalesController extends Controller
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
-
-        // Check if the logged-in user has the role 'dev' or 'admin_sales'
         $user = Auth::user();
+
         if ($user->role === 'dev' || $user->role === 'admin') {
             // Filter data for the current month and year without date
             $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
@@ -65,8 +76,8 @@ class SalesController extends Controller
             $currentDate = Carbon::now()->toDateString();
             $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
                                     ->whereYear('tanggal_order', $currentYear)
-                                    ->whereDate('tanggal_order', $currentDate)
                                     ->where('status', 3)
+                                    ->where('created_by', $user->id)
                                     ->get();
         }
 
