@@ -52,7 +52,7 @@
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td class="text-center">{{ $sale->kode }}</td>
-                            <td class="text-center">{{ $sale->tanggal_order }}</td>
+                            <td class="text-center">{{ \Carbon\Carbon::parse($sale->tanggal_order)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ $sale->brand_name }}</td>
                             <td class="text-center">
                                 @if($sale->type == 0)
@@ -184,10 +184,10 @@
    $(document).ready(function() {
        $('#salesTable').DataTable({
            paging: true,           // Enable pagination
-           pageLength: 5,          // Number of records per page
+           pageLength: 10,          // Number of records per page
            lengthMenu: [25, 50, 100], // Dropdown menu options for page length
            responsive: true, // Enable responsiveness
-           order: [[2, 'desc']]  // Ensure the table starts from the last row (counter)
+           order: [[2, 'asc']]  // Ensure the table starts from the last row (counter)
        });
    });
 </script>

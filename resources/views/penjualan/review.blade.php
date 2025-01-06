@@ -163,9 +163,9 @@
                                             <div class="modal-footer">
                                                 <form action="{{ route('penjualan.settel', $sale->id) }}" method="POST" style="display:inline;">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-primary">Settel</button>
+                                                    <button type="submit" class="btn btn-primary"><i class="fa fa-check-square" aria-hidden="true"></i> Settel</button>
                                                 </form>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa fa-window-close" aria-hidden="true"></i> Close</button>
                                             </div>
                                         </div>
                                     </div>
