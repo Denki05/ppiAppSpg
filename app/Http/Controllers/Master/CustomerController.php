@@ -22,7 +22,14 @@ class CustomerController extends Controller
 
     public function index(Request $request)
     {
-        $data['customers'] = Customer::get();
+        $user = Auth::user();
+
+        if($user->role == 'admin' || $user->role == 'dev') {
+            $data['customers'] = Customer::get();
+        } else {
+            $data['customers'] = Customer::where('created_by', $user->id)
+                ->get();
+        }
 
         return view('master.customer.index', $data);
     }

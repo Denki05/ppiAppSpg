@@ -49,7 +49,7 @@
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td class="text-center">{{ $sale->kode }}</td>
-                            <td class="text-center">{{ $sale->tanggal_order }}</td>
+                            <td class="text-center">{{ \Carbon\Carbon::parse($sale->tanggal_order)->format('d-m-Y') }}</td>
                             <td class="text-center">{{ $sale->brand_name }}</td>
                             <td class="text-center">
                                 @if($sale->type == 0)
@@ -66,7 +66,7 @@
 
                                 <!-- Modal -->
                                 <div class="modal fade" id="saleModal{{ $sale->id }}" tabindex="-1" aria-labelledby="saleModalLabel{{ $sale->id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-xl">
+                                    <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="saleModalLabel{{ $sale->id }}">Jurnal Detail {{ $sale->kode }}</h5>
@@ -75,18 +75,18 @@
                                             <div class="modal-body">
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
-                                                        <p><strong>Kode:</strong> {{ $sale->kode }}</p>
+                                                        <p><strong>Kode :</strong> {{ $sale->kode }}</p>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p><strong>Tanggal:</strong> {{ $sale->tanggal_order }}</p>
+                                                        <p><strong>Tanggal :</strong> {{ \Carbon\Carbon::parse($sale->tanggal_order)->format('d-m-Y') }}</p>
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
-                                                        <p><strong>Brand:</strong> {{ $sale->brand_name }}</p>
+                                                        <p><strong>Brand :</strong> {{ $sale->brand_name }}</p>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p><strong>Customer:</strong>
+                                                        <p><strong>Customer :</strong>
                                                             @if($sale->type == 0)
                                                                 {{ $sale->customer->nama }} - {{ $sale->customer->kecamatan->name }} - {{ $sale->customer->kabupaten->name }} - {{ $sale->customer->provinsi->name }}
                                                             @else

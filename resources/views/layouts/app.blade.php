@@ -159,6 +159,14 @@
                                     <i class="fa-solid fa-check"></i> Settel
                                 </a>
                             </li>
+
+                            @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                    <i class="fa-solid fa-file"></i> Report
+                                </a>
+                            </li>
+                            @endif
                         @endauth
                     </ul>
 

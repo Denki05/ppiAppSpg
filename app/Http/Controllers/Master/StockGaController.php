@@ -19,9 +19,15 @@ class StockGaController extends Controller
 
     public function index(Request $request)
     {
-        $apiConsumer = new ApiConsumerController();
-        $data['products'] = $apiConsumer->getItemsProducts();
-        $data['stocks'] = StockGa::get();
+        $user = Auth::user();
+        if($user->role == 'admin' || $user->role == 'dev') {
+            $apiConsumer = new ApiConsumerController();
+            $data['products'] = $apiConsumer->getItemsProducts();
+            $data['stocks'] = StockGa::get();
+        } else {
+            $data['stocks'] = StockGa::where('created_by', $user->id)
+                ->get();
+        }
 
         return view('master.stock_ga.index', $data);
     }
