@@ -44,13 +44,13 @@
                         <td class="text-center">{{ $customer->kabupaten->name ?? '-' }}</td>
                         <td class="text-center">{{ $customer->provinsi->name ?? '-' }}</td>
                         <td class="text-center">
-                            <a class="btn btn-primary" href="{{ route('master.customer.show', $customer->id) }}" role="button">Show</a>
+                            <a class="btn btn-primary" href="{{ route('master.customer.show', encrypt($customer->id)) }}" role="button"><i class="fa fa-eye" aria-hidden="true"></i></a>
                             @if (auth()->user()->role == 'dev' OR auth()->user()->role == 'admin')
-                            <a class="btn btn-warning" href="{{ route('master.customer.edit', $customer->id) }}" role="button">Edit</a>
-                            <form action="{{ route('master.customer.destroy', $customer->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                            <a href="{{ route('master.customer.edit', encrypt($customer->id)) }}" class="btn btn-warning"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                            <form action="{{ route('master.customer.destroy', encrypt($customer->id)) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
                             </form>
                             @endif
                         </td>

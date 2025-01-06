@@ -238,7 +238,9 @@ class SalesController extends Controller
     public function edit($id)
     {
         // Find the sales order by its ID
-        $sales = SalesOrder::findOrFail($id);
+        $decryptedId = decrypt($id);
+        $sales = SalesOrder::findOrFail($decryptedId);
+        // dd($decryptedId);
 
         // Fetch product data from ApiConsumerController
         $apiConsumer = new ApiConsumerController();
@@ -246,8 +248,8 @@ class SalesController extends Controller
         $data['brands'] = $apiConsumer->getItemsBrands();
         $data['customer'] = Customer::get();
         $data['sales'] = $sales;
-        $data['sales_items'] = SalesOrderItem::where('so_id', $id)->get();
-        $data['sales_ga'] = SalesOrderGa::where('so_id', $id)->get();
+        $data['sales_items'] = SalesOrderItem::where('so_id', $sales->id)->get();
+        $data['sales_ga'] = SalesOrderGa::where('so_id', $sales->id)->get();
 
         $stockGaItems = StockGa::where('brand_name', $sales->brand_name)->get();
         $data['stock_ga'] = $stockGaItems->map(function ($item) {

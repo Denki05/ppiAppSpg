@@ -64,14 +64,16 @@ class CustomerController extends Controller
 
     public function show($id)
     {
-        $data['customer'] = Customer::findOrFail($id);
+        $decryptedId = decrypt($id);
+        $data['customer'] = Customer::findOrFail($decryptedId);
 
         return view('master.customer.show', $data);
     }
 
     public function edit($id)
     {
-        $data['customer'] = Customer::findOrFail($id);
+        $decryptedId = decrypt($id);
+        $data['customer'] = Customer::findOrFail($decryptedId);
         $data['provinsi'] = Provinsi::get();
         $data['kabupaten'] = Kabupaten::get();
         $data['kelurahan'] = Kelurahan::get();
@@ -116,7 +118,8 @@ class CustomerController extends Controller
 
     public function destroy($id)
     {
-        $customer = Customer::find($id);
+        $decryptedId = decrypt($id);
+        $customer = Customer::find($decryptedId);
 
         if ($customer) {
             $customer->delete();

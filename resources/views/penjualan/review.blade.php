@@ -59,7 +59,7 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('penjualan.edit', $sale->id) }}" class="btn btn-warning"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                <a href="{{ route('penjualan.edit', encrypt($sale->id)) }}" class="btn btn-warning"><i class="fa fa-edit" aria-hidden="true"></i></a>
                                 <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saleModal{{ $sale->id }}">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </button>
