@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Penjualan\SalesOrder;
 use Illuminate\Console\Command;
+use App\Notifications\JurnalSettledNotification;
+use App\Models\User;
 
 class UpdateJurnalStatusCommand extends Command
 {
@@ -24,6 +26,11 @@ class UpdateJurnalStatusCommand extends Command
             $jurnal->status = '3';
             $jurnal->settel_by = '1'; // Setel by AUTO
             $jurnal->save();
+
+            // $user = User::find(1); // Ganti ID dengan ID user yang relevan
+            // if ($user) {
+            //     $user->notify(new JurnalSettledNotification($jurnal));
+            // }
 
             // Opsional: Log perubahan
             \Log::info("Jurnal ID {$jurnal->id} status diubah menjadi 'settle'.");
