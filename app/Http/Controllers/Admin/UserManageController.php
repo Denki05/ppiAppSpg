@@ -77,7 +77,8 @@ class UserManageController extends Controller
 
     public function edit($id)
     {
-        $data['user']       = User::findOrFail($id);
+        $decryptedId = decrypt($id);
+        $data['user']       = User::findOrFail($decryptedId);
         $data['provinsi']   = Provinsi::get();
         $data['kabupaten']  = Kabupaten::get();
         $data['kelurahan']  = Kelurahan::get();
@@ -131,7 +132,8 @@ class UserManageController extends Controller
 
     public function destroy($id)
     {
-        $user = User::find($id);
+        $decryptedId = decrypt($id);
+        $user = User::find($decryptedId);
 
         if ($user) {
             $user->delete();

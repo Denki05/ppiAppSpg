@@ -36,10 +36,10 @@
                         <td class="text-center">{{ $user->role }}</td>
                         <td class="text-center">{{ $user->vendor->nama ?? '-' }}</td>
                         <td class="text-center">
-                            <a class="btn btn-warning" href="{{ route('admin.users.edit', $user->id) }}" role="button">
+                            <a class="btn btn-warning" href="{{ route('admin.users.edit', encrypt($user->id)) }}" role="button">
                                 <i class="fa fa-pencil" aria-hidden="true"></i>
                             </a>
-                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah anda yakin menghapus akun ini?');">
+                            <form action="{{ route('admin.users.destroy', encrypt($user->id)) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah anda yakin menghapus akun ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
