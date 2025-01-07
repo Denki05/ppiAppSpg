@@ -6,6 +6,7 @@ use App\Http\Controllers\Sales\SalesController;
 use App\Http\Controllers\Master\CustomerController;
 use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Master\StockGaController;
+use App\Http\Controllers\Master\WilayahController;
 use App\Http\Controllers\ApiConsumerController;
 
 /*
@@ -86,6 +87,12 @@ Route::get('/master/vendor/show/{id}', [VendorController::class, 'show'])->name(
 Route::get('/master/vendor/edit/{id}', [VendorController::class, 'edit'])->name('master.vendor.edit');
 Route::put('/master/vendor/update/{id}', [VendorController::class, 'update'])->name('master.vendor.update');
 Route::delete('/master/vendor/destroy/{id}', [VendorController::class, 'destroy'])->name('master.vendor.destroy');
+
+// Wilayah
+Route::get('/master/wilayah', [WilayahController::class, 'index'])->name('master.wilayah.index');
+Route::get('/master/wilayah/create', [WilayahController::class, 'create'])->name('master.wilayah.create');
+Route::post('/master/wilayah/store', [WilayahController::class, 'store'])->name('master.wilayah.store');
+Route::delete('/master/wilayah/destroy/{id}', [WilayahController::class, 'destroy'])->name('master.wilayah.destroy');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {

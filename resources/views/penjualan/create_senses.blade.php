@@ -180,6 +180,22 @@ $(document).ready(function () {
         width: '100%',
     });
 
+    $('#customer_dom').on('change', function () {
+        if ($(this).val()) {
+            $('#customer_non_dom').prop('disabled', true);
+        } else {
+            $('#customer_non_dom').prop('disabled', false);
+        }
+    });
+
+    $('#customer_non_dom').on('change', function () {
+        if ($(this).val()) {
+            $('#customer_dom').prop('disabled', true);
+        } else {
+            $('#customer_dom').prop('disabled', false);
+        }
+    });
+
     function loadCustomerData(type) {
         let url = type === 'DOM' ? "{{ route('penjualan.checkCustomerDOM') }}" : "{{ route('penjualan.checkCustomerOUTDOM') }}";
         $.ajax({

@@ -129,6 +129,11 @@
                                             <i class="fa fa-users" aria-hidden="true"></i> Users
                                         </a>
                                     </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('master.wilayah.index') }}">
+                                            <i class="fa fa-users" aria-hidden="true"></i> Wilayah
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             @endif
