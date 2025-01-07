@@ -446,11 +446,11 @@ class SalesController extends Controller
             )
             ->get();
 
-        $cityPlaceholder = $customers->isNotEmpty() ? $user->kabupaten->name : 'Domisili';
+        $cityPlaceholder = $user->kabupaten->name;
 
         return response()->json([
             'customers' => $customers,
-            'placeholder' => "PILIH $cityPlaceholder"
+            'placeholder' => "Pilih $cityPlaceholder"
         ]);
     }
 
@@ -471,24 +471,11 @@ class SalesController extends Controller
             )
             ->get();
 
-        $cityPlaceholder = $customers->isNotEmpty() ? "LUAR {$user->kabupaten->name}" : 'Luar Domisili';
+        $cityPlaceholder = $user->kabupaten->name;
 
         return response()->json([
             'customers' => $customers,
-            'placeholder' => "PILIH $cityPlaceholder"
+            'placeholder' => "Pilih Luar $cityPlaceholder"
         ]);
     }
-
-
-    // public function cek_jurnal()
-    // {
-    //     $tanggalKemarin = now()->subDay()->startOfDay()->toDateString(); // Mendapatkan tanggal kemarin
-
-    //     // Ambil satu jurnal yang masih "review" dan belum ada penanganan sampai kemarin
-    //     $jurnal = SalesOrder::where('status', '2')
-    //                      ->whereDate('tanggal_order', $tanggalKemarin)
-    //                      ->first();
-
-    //     // dd($jurnal);
-    // }
 }
