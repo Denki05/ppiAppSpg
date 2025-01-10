@@ -77,11 +77,7 @@ class WilayahController extends Controller
 
         if ($wilayah) {
             // Remove area from related Kabupaten
-            $kabupaten = Kabupaten::where('area', $wilayah->nama_kawasan)->first();
-            if ($kabupaten) {
-                $kabupaten->area = null;
-                $kabupaten->save();
-            }
+            Kabupaten::where('area', $wilayah->nama_kawasan)->update(['area' => null]);
 
             $wilayah->delete();
             return redirect()->route('master.wilayah.index')->with('success', 'Wilayah Berhasil di hapus.');
