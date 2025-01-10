@@ -131,7 +131,7 @@
                                     </li>
                                     <li>
                                         <a class="dropdown-item" href="{{ route('master.wilayah.index') }}">
-                                            <i class="fa fa-users" aria-hidden="true"></i> Wilayah
+                                            <i class="fa fa-globe" aria-hidden="true"></i> Wilayah
                                         </a>
                                     </li>
                                 </ul>
