@@ -29,14 +29,24 @@
         </div>
 
         <div class="col-md-6">
+            <label for="kota" class="form-label">Kota</label>
+            <select class="form-select select2" id="kota" name="kota[]" multiple="multiple" required>
+                <option value="">Pilih Kota</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
             <label for="kecamatan" class="form-label">Nama Wilayah</label>
             <input type="text" class="form-control" id="wilayah" name="wilayah" required>
         </div>
 
         <div class="col-md-6">
-            <label for="kota" class="form-label">Kota</label>
-            <select class="form-select select2" id="kota" name="kota[]" multiple="multiple" required>
-                <option value="">Pilih Kota</option>
+            <label for="user" class="form-label">User</label>
+            <select class="form-select select2" id="user" name="user" >
+                <option value="">Pilih User</option>
+                @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
             </select>
         </div>
         

@@ -431,23 +431,38 @@ class SalesController extends Controller
     public function checkCustomerDOM()
     {
         $user = User::find(Auth::id());
+        $area = $user->area;
 
-        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
+        // Query dasar menggunakan Eloquent
+        $query = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
             ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
             ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-            ->where('master_customer.provinsi_id', $user->provinsi_id)
-            ->where('master_customer.kabupaten_id', $user->kabupaten_id)
             ->select(
                 'master_customer.id as customer_id',
-                'master_customer.nama as customer_nama', 
+                'master_customer.nama as customer_nama',
                 'districts.name as customer_kecamatan',
-                'regencies.name as customer_kota', 
+                'regencies.name as customer_kota',
                 'provinces.name as customer_provinsi'
-            )
-            ->get();
+            );
 
-        $cityPlaceholder = $user->kabupaten->name;
+        // Kondisi jika area tidak ada (default ke provinsi dan kabupaten user)
+        if ($area == null) {
+            $query->where('master_customer.provinsi_id', $user->provinsi_id)
+                ->where('master_customer.kabupaten_id', $user->kabupaten_id)
+                ->where('master_customer.user_id', $user->id);
+        } else {
+            // Filter berdasarkan area dan user login
+            $query->where('regencies.area', $area)
+                ->where('master_customer.user_id', $user->id);
+        }
 
+        // Eksekusi query
+        $customers = $query->orderBy('master_customer.nama', 'asc')->get();
+
+        // Placeholder
+        $cityPlaceholder = $area ?? 'Kota/Kabupaten';
+
+        // Response JSON
         return response()->json([
             'customers' => $customers,
             'placeholder' => "Pilih $cityPlaceholder"
@@ -457,22 +472,38 @@ class SalesController extends Controller
     public function checkCustomerOUTDOM()
     {
         $user = User::find(Auth::id());
-
+        $area = $user->area;
+    
+        // Query menggunakan Eloquent
         $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
             ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-            ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+            ->where(function ($query) use ($area, $user) {
+                if ($area) {
+                    // Jika area ada, filter regencies.area tidak sama dengan area
+                    $query->where('regencies.area', null)
+                        ->where('master_customer.provinsi_id', '=', $user->provinsi_id)
+                        ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+                        ->where('master_customer.user_id', $user->id);
+                } else {
+                    // Jika area null, filter berdasarkan provinsi_id dan kabupaten_id
+                    $query->where('master_customer.provinsi_id', $user->provinsi_id)
+                          ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+                          ->where('master_customer.user_id', $user->id);
+                }
+            })
             ->select(
                 'master_customer.id as customer_id',
                 'master_customer.nama as customer_nama',
-                'districts.name as customer_kecamatan',
                 'regencies.name as customer_kota',
                 'provinces.name as customer_provinsi'
             )
+            ->orderBy('master_customer.nama', 'asc')
             ->get();
-
-        $cityPlaceholder = $user->kabupaten->name;
-
+    
+        // Placeholder
+        $cityPlaceholder = $area ?? 'Kota/Kabupaten';
+    
+        // Response JSON
         return response()->json([
             'customers' => $customers,
             'placeholder' => "Pilih Luar $cityPlaceholder"

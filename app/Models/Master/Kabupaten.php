@@ -13,6 +13,7 @@ class Kabupaten extends Model
     protected $fillable =[
         'province_id',
         'name',
+        'area'
     ];
 
     public function customer()
