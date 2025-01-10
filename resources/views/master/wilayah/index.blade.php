@@ -36,12 +36,23 @@
                 </thead>
                 <tbody>
                     @foreach($wilayah as $key => $value)
+                    @php
+                        // Pecah `kabupaten_id` menjadi array
+                        $kabupatenIds = explode(',', $value->kabupaten_id); 
+
+                        // Ambil data kabupaten yang terkait
+                        $kabupatens = \App\Models\Master\Kabupaten::whereIn('id', $kabupatenIds)->pluck('name')->toArray();
+                    @endphp
                     <tr>
                         <td class="text-center">{{ $key + 1 }}</td>
                         <td class="text-center">{{ $value->nama_kawasan }}</td>
                         <td class="text-center">{{ $value->provinsi->name }}</td>
                         <td class="text-center">
-                            {{ $value->kabupaten->name }}
+                            @if(!empty($kabupatens))
+                                {{ implode(', ', $kabupatens) }} <!-- Gabungkan nama kabupaten dengan koma -->
+                            @else
+                                -
+                            @endif
                         </td>
                         <td class="text-center">
                             <form action="{{ route('master.wilayah.destroy', encrypt($value->id)) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">

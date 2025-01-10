@@ -30,6 +30,11 @@ class Customer extends Model
     	1 => 'ACTIVE',
     ];
 
+    public function user()
+    {
+        return $this->BelongsTo('App\Models\User', 'user_id', 'id');
+    }
+
     public function provinsi()
     {
         return $this->BelongsTo('App\Models\Master\Provinsi', 'provinsi_id', 'id');

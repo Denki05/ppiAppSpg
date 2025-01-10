@@ -431,22 +431,24 @@ class SalesController extends Controller
     public function checkCustomerDOM()
     {
         $user = User::find(Auth::id());
-
-        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
-            ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-            ->where('master_customer.provinsi_id', $user->provinsi_id)
-            ->where('master_customer.kabupaten_id', $user->kabupaten_id)
+        $area = $user->area;
+    
+        $customers = DB::table('master_customer')
+            ->join('provinces', 'master_customer.provinsi_id', '=', 'provinces.id')
+            ->join('regencies', 'master_customer.kabupaten_id', '=', 'regencies.id')
+            ->join('users', 'master_customer.user_id', '=', 'users.id')
+            ->where('regencies.area', $area)
+            ->where('users.id', $user->id)
             ->select(
                 'master_customer.id as customer_id',
-                'master_customer.nama as customer_nama', 
-                'districts.name as customer_kecamatan',
-                'regencies.name as customer_kota', 
-                'provinces.name as customer_provinsi'
+                'master_customer.nama as customer_nama',
+                'provinces.name as customer_provinsi',
+                'regencies.name as customer_kota'
             )
+            ->orderBy('master_customer.nama', 'asc')
             ->get();
 
-        $cityPlaceholder = $user->kabupaten->name;
+        $cityPlaceholder = $user->area;
 
         return response()->json([
             'customers' => $customers,
@@ -457,21 +459,24 @@ class SalesController extends Controller
     public function checkCustomerOUTDOM()
     {
         $user = User::find(Auth::id());
+        $area = $user->area;
 
-        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
-            ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-            ->leftJoin('districts', 'districts.id', '=', 'master_customer.kecamatan_id')
-            ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+        $customers = DB::table('master_customer')
+            ->join('provinces', 'master_customer.provinsi_id', '=', 'provinces.id')
+            ->join('regencies', 'master_customer.kabupaten_id', '=', 'regencies.id')
+            ->join('users', 'master_customer.user_id', '=', 'users.id')
+            ->where('regencies.area', '!=', $area)
+            ->where('users.id', $user->id)
             ->select(
                 'master_customer.id as customer_id',
                 'master_customer.nama as customer_nama',
-                'districts.name as customer_kecamatan',
-                'regencies.name as customer_kota',
-                'provinces.name as customer_provinsi'
+                'provinces.name as customer_provinsi',
+                'regencies.name as customer_kota'
             )
+            ->orderBy('master_customer.nama', 'asc')
             ->get();
 
-        $cityPlaceholder = $user->kabupaten->name;
+        $cityPlaceholder = $user->area;
 
         return response()->json([
             'customers' => $customers,

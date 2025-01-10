@@ -13,9 +13,14 @@ class Wilayah extends Model
     protected $fillable =[
         'provinsi_id', 
         'nama_kawasan',
-        'kota_id', 
+        'area',
+        'kabupaten_id', 
         'created_by', 
         'updated_by',
+    ];
+
+    protected $casts = [
+        'kabupaten_id' => 'array',
     ];
 
     public function provinsi()
@@ -25,6 +30,6 @@ class Wilayah extends Model
 
     public function kabupaten()
     {
-        return $this->BelongsTo('App\Models\Master\Kabupaten', 'kota_id', 'id');
+        return $this->BelongsTo('App\Models\Master\Kabupaten', 'kabupaten_id', 'id');
     }
 }

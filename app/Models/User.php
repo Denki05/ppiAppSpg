@@ -26,6 +26,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'area',
         'kota', 
         'provinsi_id', 
         'kabupaten_id', 
@@ -61,5 +62,9 @@ class User extends Authenticatable
     public function kabupaten()
     {
         return $this->BelongsTo('App\Models\Master\Kabupaten', 'kabupaten_id', 'id');
+    }
+
+    public function Customer(){
+        return $this->hasMany('App\Models\Master\Customer', 'user_id', 'id');
     }
 }
