@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Models\Penjualan\SalesOrder;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -11,43 +11,32 @@ class JurnalSettledNotification extends Notification
 {
     use Queueable;
 
+    protected $jurnal;
+
     /**
-     * Create a new notification instance.
+     * Buat instance notifikasi baru.
      *
+     * @param  \App\Models\Penjualan\SalesOrder  $jurnal
      * @return void
      */
-    public function __construct()
+    public function __construct(SalesOrder $jurnal)
     {
-        //
+        $this->jurnal = $jurnal;
     }
 
     /**
-     * Get the notification's delivery channels.
+     * Menentukan saluran pengiriman notifikasi.
      *
      * @param  mixed  $notifiable
      * @return array
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['database'];
     }
-
+    
     /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
-     */
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
+     * Menyusun notifikasi untuk saluran lain (jika ada).
      *
      * @param  mixed  $notifiable
      * @return array
@@ -55,7 +44,11 @@ class JurnalSettledNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'jurnal_id' => $this->jurnal->id,
+            'status' => $this->jurnal->status,
+            'message' => 'Jurnal dengan ID ' . $this->jurnal->id . ' telah di proses settel oleh sistem.',
+            'tanggal_order' => $this->jurnal->tanggal_order,
+            'settel_by' => $this->so->settel_by ?? null,
         ];
     }
 }

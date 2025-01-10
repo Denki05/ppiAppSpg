@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiConsumerController;
+use App\Notifications\JurnalSettledNotification;
 use App\Rules\ProductExists;
 use App\Models\Penjualan\SalesOrder;
 use App\Models\Penjualan\SalesOrderItem;
@@ -215,6 +216,13 @@ class SalesController extends Controller
                     'unit_weight' => 1, // Assuming a default weight of 1
                 ]);
             }
+
+            // $userIds = [3, 9];
+            // $users = User::whereIn('id', $userIds)->get();
+
+            // foreach ($users as $user) {
+            //     $user->notify(new JurnalSettledNotification($penjualan));
+            // }
 
             // Commit the transaction
             DB::commit();

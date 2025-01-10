@@ -27,15 +27,17 @@ class UpdateJurnalStatusCommand extends Command
             $jurnal->settel_by = '1'; // Setel by AUTO
             $jurnal->save();
 
-            // $user = User::find(1); // Ganti ID dengan ID user yang relevan
-            // if ($user) {
-            //     $user->notify(new JurnalSettledNotification($jurnal));
-            // }
+            $userIds = [3, 9];
+            $users = User::whereIn('id', $userIds)->get();
+
+            foreach ($users as $user) {
+                $user->notify(new JurnalSettledNotification($penjualan));
+            }
 
             // Opsional: Log perubahan
             \Log::info("Jurnal ID {$jurnal->id} status diubah menjadi 'settle'.");
         }
 
-        $this->info('Status jurnal berhasil diupdate.');
+        $this->info('Status jurnal berhasil diupdate dan notifikasi terkirim.');
     }
 }
