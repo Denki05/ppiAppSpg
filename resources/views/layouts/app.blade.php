@@ -49,24 +49,91 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Aktifkan submenu
+            // Submenu Dropdown
             document.querySelectorAll('.dropdown-submenu').forEach(function (element) {
                 element.addEventListener('mouseenter', function () {
                     let submenu = this.querySelector('.dropdown-menu');
-                    if (submenu) {
-                        submenu.style.display = 'block';
-                    }
+                    if (submenu) submenu.style.display = 'block';
                 });
 
                 element.addEventListener('mouseleave', function () {
                     let submenu = this.querySelector('.dropdown-menu');
-                    if (submenu) {
-                        submenu.style.display = 'none';
-                    }
+                    if (submenu) submenu.style.display = 'none';
                 });
             });
-        });
 
+            // Fungsi untuk memuat notifikasi
+            function loadNotifications() {
+                $.ajax({
+                    url: '{{ route("getNotifData") }}', // Pastikan route ini benar
+                    method: 'GET',
+                    success: function (response) {
+                        const notifList = $('#notifList');
+                        const notifCount = $('#notifCount');
+
+                        notifList.empty(); // Kosongkan elemen sebelum menambahkan data baru
+                        if (response.notifications && response.notifications.length > 0) {
+                            notifCount.text(response.notifications.length).show(); // Tampilkan badge
+                            response.notifications.forEach(function (notif) {
+                                const message = notif.data?.message || 'No message'; // Pesan default
+                                const createdAt = notif.created_at
+                                    ? new Date(notif.created_at).toLocaleString()
+                                    : 'Unknown date';
+                                const notifItem = `
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>${message}</div>
+                                            <small>${createdAt}</small>
+                                        </div>
+                                    </a>
+                                `;
+                                notifList.append(notifItem);
+                            });
+                        } else {
+                            notifList.append('<div class="text-center p-3">No notifications available.</div>');
+                            notifCount.hide(); // Sembunyikan badge jika tidak ada notifikasi
+                        }
+                    },
+                    error: function (xhr) {
+                        // Tangani error 401 secara diam-diam tanpa pesan atau redirect
+                        if (xhr.status !== 401) {
+                            console.error('Error loading notifications:', xhr.statusText);
+                        }
+                    },
+                });
+            }
+
+            // Fungsi untuk menandai semua notifikasi sebagai telah dibaca
+            function markAllAsRead() {
+                $.ajax({
+                    url: '{{ route("unread_all_notif") }}', // Pastikan route ini benar
+                    method: 'POST',
+                    data: { _token: '{{ csrf_token() }}' }, // Kirim CSRF token untuk keamanan
+                    success: function (response) {
+                        if (response.success) {
+                            loadNotifications(); // Refresh notifikasi setelah berhasil
+                        } else {
+                            alert(response.message || 'Failed to mark notifications as read.');
+                        }
+                    },
+                    error: function (xhr) {
+                        // Tangani error 401 secara diam-diam tanpa pesan atau redirect
+                        if (xhr.status !== 401) {
+                            console.error('Error marking notifications as read:', xhr.statusText);
+                        }
+                    },
+                });
+            }
+
+            // Panggil fungsi untuk memuat notifikasi secara berkala
+            setInterval(loadNotifications, 5000); // Setiap 5 detik
+
+            // Panggil fungsi untuk memuat notifikasi saat halaman dimuat
+            loadNotifications();
+
+            // Event listener untuk tombol "Mark All as Read"
+            $('#markAllAsReadBtn').on('click', markAllAsRead);
+        });
     </script>
 </head>
 <body>
@@ -179,6 +246,35 @@
                         @guest
                             <!-- Guest links if needed (e.g., Login, Register) -->
                         @else
+                            <!-- Notifikasi -->
+                            <li class="nav-item dropdown">
+                                <a
+                                    class="nav-link dropdown-toggle"
+                                    href="#"
+                                    id="notificationDropdown"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    <i class="fa-solid fa-bell"></i>
+                                    <span id="notifCount" class="badge bg-danger" style="display: none;"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notificationDropdown">
+                                    <div class="card" style="width: 24rem; max-height: 400px; overflow-y: auto;">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="card-title mb-0">Notifications</h5>
+                                            <button type="button" class="btn btn-link btn-sm" id="markAllAsReadBtn">
+                                                Mark All as Read
+                                            </button>
+                                        </div>
+                                        <div class="list-group list-group-flush" id="notifList">
+                                            <div class="text-center p-3">Loading...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- User name -->
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     <i class="fa-solid fa-user-tie"></i> {{ Auth::user()->name }}

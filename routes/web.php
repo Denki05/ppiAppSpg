@@ -8,6 +8,7 @@ use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Master\StockGaController;
 use App\Http\Controllers\Master\WilayahController;
 use App\Http\Controllers\ApiConsumerController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,11 @@ Route::get('/brands', [ApiConsumerController::class, 'getItemsBrands'])->name('b
 Route::get('/product/brand/{brand}', [ApiConsumerController::class, 'getProductsByBrand']);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/getNotifData', [HomeController::class, 'getNotifData'])->name('getNotifData');
+    Route::post('/unread_all_notif', [HomeController::class, 'unread_all_notif'])->name('unread_all_notif');
+});
 
 // master product
 Route::get('/product', [App\Http\Controllers\ProductController::class, 'index'])->name('product');

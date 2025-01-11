@@ -44,7 +44,6 @@ class SalesController extends Controller
             // Filter data untuk bulan dan tahun saat ini
             $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
                 ->whereYear('tanggal_order', $currentYear)
-                ->whereDate('tanggal_order', $currentDate)
                 ->where('status', 2)
                 ->get();
         } else {
@@ -230,6 +229,7 @@ class SalesController extends Controller
             // Redirect with success message
             return redirect()->route('home')->with('success', 'Jurnal berhasil di input.');
         } catch (\Exception $e) {
+            dd($e);
             // Rollback the transaction in case of error
             DB::rollback();
 

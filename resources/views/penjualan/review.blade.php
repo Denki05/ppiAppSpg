@@ -40,6 +40,9 @@
                         <th class="text-center">Tanggal</th>
                         <th class="text-center">Brand</th>
                         <th class="text-center">Customer</th>
+                        @if(Auth::user()->role == 'admin' || Auth::user()->role == 'dev')
+                        <th class="text-center">SPG</th>
+                        @endif
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -56,6 +59,11 @@
                                     {{ $sale->customer->nama }}, {{ $sale->customer->kecamatan->name ?? '-' }} - {{ $sale->customer->kabupaten->name ?? '-' }} - {{ $sale->customer->provinsi->name ?? '-' }}
                                 @else
                                     CASH
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if(Auth::user()->role == 'admin' || Auth::user()->role == 'dev')
+                                    {{ $sale->createdByUser() ?? '-' }}
                                 @endif
                             </td>
                             <td>
