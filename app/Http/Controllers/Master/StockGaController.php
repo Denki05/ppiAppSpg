@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiConsumerController;
 use App\Models\Master\StockGa;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StockGaTemplateExport;
+use App\Imports\StockGaImport;
 
 class StockGaController extends Controller
 {
@@ -20,6 +24,7 @@ class StockGaController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $data['user'] = User::where('role', 'spg')->get();
         if($user->role == 'admin' || $user->role == 'dev') {
             $apiConsumer = new ApiConsumerController();
             $data['products'] = $apiConsumer->getItemsProducts();
@@ -41,6 +46,7 @@ class StockGaController extends Controller
     {
         // Validate the incoming data
         $request->validate([
+            'spg' => 'required',
             'variant' => 'required',
             'brand' => 'required|string',
             'botol' => 'required|numeric|min:1',
@@ -66,6 +72,7 @@ class StockGaController extends Controller
 
         // Save the data to the database
         $stock = new StockGa();
+        $stock->user_id = $request->spg;
         $stock->product_id = $request->variant;
         $stock->brand_name = $request->brand;
         $stock->qty = $get_volume;
@@ -115,5 +122,29 @@ class StockGaController extends Controller
             'success' => true,
             'message' => "Stock berhasil di tambahkan!.",
         ]);
+    }
+    
+    public function export(Request $request)
+    {
+        return Excel::download(new StockGaTemplateExport, 'stock_ga_template.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            $import = new StockGaImport();
+            Excel::import($import, $request->file('file'));
+
+            return redirect()->back()->with([
+                'collect_success' => $import->success,
+                'collect_error' => $import->error
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 }

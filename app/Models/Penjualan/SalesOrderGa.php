@@ -22,7 +22,7 @@ class SalesOrderGa extends Model
     public function getProductDataFromApi($productId)
     {
         // Fetch all products from the API
-        $response = Http::get("http://ppiapps.sytes.net:8000/api/products");
+        $response = Http::get("https://lssoft88.xyz/api/products");
 
         if ($response->successful()) {
             $products = $response->json();

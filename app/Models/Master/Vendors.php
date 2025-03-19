@@ -21,6 +21,7 @@ class Vendors extends Model
         'kelurahan_id',
         'shift_start',
         'shift_end',
+        'is_cash',
         'created_by',
         'updated_by',
     ];

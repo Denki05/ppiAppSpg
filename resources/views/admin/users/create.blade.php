@@ -29,13 +29,33 @@
         </div>
 
         <div class="col-md-6">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        class="form-control" 
+                        placeholder="Leave blank if not changing">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password', 'togglePasswordIcon')">
+                        <i id="togglePasswordIcon" class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
 
-        <div class="col-md-6">
-            <label for="password_confirmation" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+            <div class="col-md-6">
+                <label for="password_confirmation" class="form-label">Confirm Password</label>
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        name="password_confirmation" 
+                        id="password_confirmation" 
+                        class="form-control" 
+                        placeholder="Leave blank if not changing">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password_confirmation', 'toggleConfirmPasswordIcon')">
+                        <i id="toggleConfirmPasswordIcon" class="fas fa-eye"></i>
+                    </button>
+                </div>
         </div>
 
         <div class="col-md-6">
@@ -87,6 +107,21 @@
                 <option value="">Pilih Kelurahan</option>
             </select>
         </div>
+        
+        <div class="col-md-6">
+                <label class="form-label">Is Cash</label>
+                <div class="form-check">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="is_cash" 
+                        id="is_cash" 
+                        value="1">
+                    <label class="form-check-label" for="is_cash">
+                        Iya (centang jika cash)
+                    </label>
+                </div>
+        </div>
     </div>
 
     <div class="mt-4">
@@ -100,6 +135,21 @@
 
 @section('scripts')
 <script>
+    function togglePassword(fieldId, iconId) {
+        let passwordField = document.getElementById(fieldId);
+        let icon = document.getElementById(iconId);
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+
     $(document).ready(function() {
         $('.select2').select2();
 

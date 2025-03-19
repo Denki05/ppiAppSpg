@@ -64,7 +64,7 @@ class User extends Authenticatable
         return $this->BelongsTo('App\Models\Master\Kabupaten', 'kabupaten_id', 'id');
     }
 
-    public function Customer(){
-        return $this->hasMany('App\Models\Master\Customer', 'user_id', 'id');
+    public function stock_ga(){
+        return $this->hasMany('App\Models\Master\StockGa', 'user_id', 'id');
     }
 }

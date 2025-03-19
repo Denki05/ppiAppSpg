@@ -40,7 +40,6 @@ class HomeController extends Controller
         // Ambil notifikasi yang belum dibaca
         $notifications = DB::table('notifications')
             ->where('notifiable_id', $userId)
-            ->whereNull('read_at')
             ->where('type', 'App\Notifications\JurnalSettledNotification')
             ->orderBy('created_at', 'desc')
             ->limit(10) // Batasi jumlah notifikasi

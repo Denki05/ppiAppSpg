@@ -85,6 +85,10 @@
            responsive: true, // Enable responsiveness
            order: [[2, 'desc']]  // Ensure the table starts from the last row (counter)
        });
+       
+        setTimeout(function() {
+            $(".alert").fadeOut('slow');
+        }, 2000);
    });
 </script>
 @endsection

@@ -91,8 +91,9 @@ class SalesController extends Controller
         $data['products'] = $apiConsumer->getItemsProducts();
         $data['brands'] = $apiConsumer->getItemsBrands();
         $data['customer'] = Customer::get();
+        $data['users'] = Auth::user();
         
-        $stockGaItems = StockGa::where('brand_name', 'Senses')->get();
+        $stockGaItems = StockGa::where('brand_name', 'Senses')->where('user_id', Auth::id())->get();
         $data['stock_ga'] = $stockGaItems->map(function ($item) {
             $productData = $item->getProductDataFromApi($item->product_id);
             return [
@@ -102,6 +103,8 @@ class SalesController extends Controller
                 'code' => $productData['code'] ?? null,
             ];
         });
+        
+        $data['user'] = User::where('role', "spg")->get();
 
         // Pass the product and unit weight data to the view
         return view('penjualan.create_senses', $data);
@@ -114,8 +117,9 @@ class SalesController extends Controller
         $data['products'] = $apiConsumer->getItemsProducts();
         $data['brands'] = $apiConsumer->getItemsBrands();
         $data['customer'] = Customer::get();
+        $data['users'] = Auth::user();
         
-        $stockGaItems = StockGa::where('brand_name', 'GCF')->get();
+        $stockGaItems = StockGa::where('brand_name', 'GCF')->where('user_id', Auth::id())->get();
         $data['stock_ga'] = $stockGaItems->map(function ($item) {
             $productData = $item->getProductDataFromApi($item->product_id);
             return [
@@ -125,6 +129,8 @@ class SalesController extends Controller
                 'code' => $productData['code'] ?? null,
             ];
         });
+        
+        $data['user'] = User::where('role', "spg")->get();
 
         // Pass the product and unit weight data to the view
         return view('penjualan.create_gcf', $data);
@@ -153,6 +159,9 @@ class SalesController extends Controller
             // Determine customer type and value
             $customer_id = $request->customer_dom ?? $request->customer_non_dom ?? null;
             $customer_type = !empty($request->customerCash) ? 1 : 0;
+            
+            $date_req = $request->tanggal_jurnal;
+            $spg_note = $request->spg_name;
 
             if (!$customer_id && $customer_type === 0) {
                 return redirect()->back()->withErrors(['error' => 'You must select a customer or provide a cash value.']);
@@ -164,9 +173,9 @@ class SalesController extends Controller
                 'customer_id' => $customer_id,
                 'type' => $customer_type,
                 'brand_name' => $request->brand_name,
-                'tanggal_order' => now()->toDateString(),
+                'tanggal_order' => $date_req ?? now()->toDateString(),
                 'status' => 2,
-                'created_by' => Auth::id(),
+                'created_by' => $spg_note ?? Auth::id(),
             ]);
 
             // Handle "Give Away" (GA) items if applicable
@@ -227,7 +236,8 @@ class SalesController extends Controller
             DB::commit();
 
             // Redirect with success message
-            return redirect()->route('home')->with('success', 'Jurnal berhasil di input.');
+            // return redirect()->route('home')->with('success', 'Jurnal berhasil di input.');
+            return redirect()->back()->with('success', 'Jurnal berhasil diinput.');
         } catch (\Exception $e) {
             dd($e);
             // Rollback the transaction in case of error
@@ -295,6 +305,7 @@ class SalesController extends Controller
             $penjualan->customer_id = $request->customer;
             $penjualan->brand_name = $request->brand_name;
             $penjualan->updated_by = Auth::id();
+            $penjualan->count_rev = 1;
             $penjualan->save();
 
             // Restore the previous stock before deleting SalesOrderGa
@@ -366,7 +377,8 @@ class SalesController extends Controller
 
             DB::commit();
             // return redirect()->back()->with('success', 'Data updated successfully.');
-            return redirect()->route('home')->with('success', 'Jurnal berhasil di input.');
+            // return redirect()->route('home')->with('success', 'Jurnal berhasil di input.');
+            return redirect()->back()->with('success', 'Jurnal berhasil diupdate.');
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error updating SalesOrder', ['error' => $e->getMessage()]);
@@ -427,8 +439,7 @@ class SalesController extends Controller
             $sales_item->update(['deleted_at' => now()]);
 
             // Redirect back with success message
-            // return redirect()->route('penjualan.index')->with('success', 'Jurnal berhasil di hapus.');
-            return redirect()->route('home')->with('success', 'Jurnal berhasil di hapus.');
+            return redirect()->back()->with('success', 'Jurnal berhasil di hapus.');
 
         } catch (\Exception $e) {
             // Handle the error and redirect back with error message

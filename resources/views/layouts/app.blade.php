@@ -11,7 +11,12 @@
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel=
+        // Set notif auto close
+        setTimeout(function() {
+            $(".alert").fadeOut('slow');
+        }, 2000);
+    "stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
     
     <!-- Styles -->
@@ -48,39 +53,73 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <script>
+        // Set notif auto close
+        setTimeout(function() {
+            $(".alert").fadeOut('slow');
+        }, 4000);
+    
         document.addEventListener('DOMContentLoaded', function () {
-            // Submenu Dropdown
-            document.querySelectorAll('.dropdown-submenu').forEach(function (element) {
-                element.addEventListener('mouseenter', function () {
-                    let submenu = this.querySelector('.dropdown-menu');
-                    if (submenu) submenu.style.display = 'block';
-                });
-
-                element.addEventListener('mouseleave', function () {
-                    let submenu = this.querySelector('.dropdown-menu');
-                    if (submenu) submenu.style.display = 'none';
+            document.querySelectorAll('.dropdown > a').forEach(function (element) {
+                element.addEventListener('click', function (e) {
+                    if (window.innerWidth <= 768) {
+                        e.preventDefault(); // Mencegah navigasi langsung
+                        let submenu = this.nextElementSibling;
+                        if (submenu) {
+                            submenu.classList.toggle('show'); // Toggle tampilan submenu
+                        }
+                    }
                 });
             });
+        });
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            $('.dropdown-submenu > a').on("click", function(e) {
+                var submenu = $(this).next('.dropdown-menu');
+                if (submenu.is(':visible')) {
+                    submenu.hide();
+                } else {
+                    $('.dropdown-submenu .dropdown-menu').hide(); // Tutup semua submenu lain
+                    submenu.show();
+                }
+                e.stopPropagation(); // Mencegah event bubbling
+                e.preventDefault(); // Mencegah navigasi default
+            });
+        
+            // Menutup dropdown jika di-klik di luar
+            $(document).on("click", function(e) {
+                if (!$(e.target).closest('.dropdown-submenu').length) {
+                    $('.dropdown-submenu .dropdown-menu').hide();
+                }
+            });
+        });
 
+    
+        document.addEventListener('DOMContentLoaded', function () {
             // Fungsi untuk memuat notifikasi
             function loadNotifications() {
                 $.ajax({
-                    url: '{{ route("getNotifData") }}', // Pastikan route ini benar
+                    url: '{{ route("getNotifData") }}',
                     method: 'GET',
                     success: function (response) {
                         const notifList = $('#notifList');
                         const notifCount = $('#notifCount');
-
+            
                         notifList.empty(); // Kosongkan elemen sebelum menambahkan data baru
+                        let unreadCount = 0; // Menyimpan jumlah notifikasi belum dibaca
+            
                         if (response.notifications && response.notifications.length > 0) {
-                            notifCount.text(response.notifications.length).show(); // Tampilkan badge
                             response.notifications.forEach(function (notif) {
-                                const message = notif.data?.message || 'No message'; // Pesan default
-                                const createdAt = notif.created_at
-                                    ? new Date(notif.created_at).toLocaleString()
+                                const message = notif.data?.message || 'No message';
+                                const createdAt = notif.created_at 
+                                    ? new Date(notif.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) 
                                     : 'Unknown date';
+                                
+                                const isRead = notif.read_at !== null;
+                                if (!isRead) unreadCount++; // Hitung notifikasi yang belum dibaca
+                                
+                                const notifClass = isRead ? 'text-muted' : 'fw-bold';
                                 const notifItem = `
-                                    <a href="#" class="list-group-item list-group-item-action">
+                                    <a href="#" class="list-group-item list-group-item-action ${notifClass}">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>${message}</div>
                                             <small>${createdAt}</small>
@@ -89,13 +128,19 @@
                                 `;
                                 notifList.append(notifItem);
                             });
+            
+                            // Perbarui jumlah badge berdasarkan jumlah notifikasi belum dibaca
+                            if (unreadCount > 0) {
+                                notifCount.text(unreadCount).show();
+                            } else {
+                                notifCount.hide();
+                            }
                         } else {
                             notifList.append('<div class="text-center p-3">No notifications available.</div>');
                             notifCount.hide(); // Sembunyikan badge jika tidak ada notifikasi
                         }
                     },
                     error: function (xhr) {
-                        // Tangani error 401 secara diam-diam tanpa pesan atau redirect
                         if (xhr.status !== 401) {
                             console.error('Error loading notifications:', xhr.statusText);
                         }

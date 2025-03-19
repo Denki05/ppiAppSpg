@@ -46,29 +46,42 @@
                     value="{{ old('email', $user->email) }}" 
                     required>
             </div>
+            
             <div class="col-md-6">
                 <label for="password" class="form-label">Password</label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    id="password" 
-                    class="form-control" 
-                    placeholder="Leave blank if not changing">
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        class="form-control" 
+                        placeholder="Leave blank if not changing">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password', 'togglePasswordIcon')">
+                        <i id="togglePasswordIcon" class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
+
             <div class="col-md-6">
                 <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input 
-                    type="password" 
-                    name="password_confirmation" 
-                    id="password_confirmation" 
-                    class="form-control" 
-                    placeholder="Leave blank if not changing">
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        name="password_confirmation" 
+                        id="password_confirmation" 
+                        class="form-control" 
+                        placeholder="Leave blank if not changing">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password_confirmation', 'toggleConfirmPasswordIcon')">
+                        <i id="toggleConfirmPasswordIcon" class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Dropdowns -->
             <div class="col-md-6">
                 <label for="role" class="form-label">Role</label>
                 <select name="role" id="role" class="form-control select2" required>
+                    <option value="dev" {{ $user->role === 'dev' ? 'selected' : '' }}>Dev</option>
                     <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
                     <option value="spg" {{ $user->role === 'spg' ? 'selected' : '' }}>SPG</option>
                 </select>
@@ -99,22 +112,47 @@
                 </select>
             </div>
             <div class="col-md-6">
+                @php
+                    $kabupaten = DB::table('regencies')->where('id', $user->kabupaten_id)->first();
+                @endphp
                 <label for="kota" class="form-label">Kota</label>
                 <select name="kota" id="kota" class="form-control select2" required>
-                    <option value="">Select Kota</option>
+                    <option value="{{ $kabupaten->id }}">{{ $kabupaten->name }}</option>
                 </select>
             </div>
             <div class="col-md-6">
+                @php
+                    $kecamatan = DB::table('districts')->where('id', $user->kecamatan_id)->first();
+                @endphp
                 <label for="kecamatan" class="form-label">Kecamatan</label>
                 <select name="kecamatan" id="kecamatan" class="form-control select2" required>
-                    <option value="">Select Kecamatan</option>
+                    <option value="{{ $kecamatan->id ?? '' }}">{{ $kecamatan->name ?? '' }}</option>
                 </select>
             </div>
             <div class="col-md-6">
+                @php
+                    $kelurahan = DB::table('villages')->where('id', $user->kelurahan_id)->first();
+                @endphp
                 <label for="kelurahan" class="form-label">Kelurahan</label>
                 <select name="kelurahan" id="kelurahan" class="form-control select2" required>
-                    <option value="">Select Kelurahan</option>
+                    <option value="{{ $kelurahan->id ?? '' }}">{{ $kelurahan->name ?? '' }}</option>
                 </select>
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label">Is Cash</label>
+                <div class="form-check">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="is_cash" 
+                        id="is_cash" 
+                        value="1" 
+                        {{ old('is_cash', $user->is_cash) == 1 ? 'checked' : '' }}>
+                    <label class="form-check-label" for="is_cash">
+                        Iya (centang jika cash)
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -128,6 +166,21 @@
 
 @section('scripts')
 <script>
+    function togglePassword(fieldId, iconId) {
+        let passwordField = document.getElementById(fieldId);
+        let icon = document.getElementById(iconId);
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+
     $(document).ready(function () {
         $('.select2').select2();
 

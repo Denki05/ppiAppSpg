@@ -69,6 +69,21 @@
             </select>
         </div>
         
+        <div class="col-md-6">
+            <label class="form-label">Is Cash</label>
+            <div class="form-check">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    name="is_cash" 
+                    id="is_cash" 
+                    value="1">
+                <label class="form-check-label" for="is_cash">
+                    Iya (centang jika cash)
+                </label>
+            </div>
+        </div>
+        
         <div class="mt-4">
             <a class="btn btn-danger" href="{{ route('master.customer.index') }}" role="button">Back</a>
             <button type="submit" class="btn btn-primary">Save</button>

@@ -53,6 +53,7 @@ class VendorController extends Controller
             'kabupaten_id' => $request->kota,
             'kecamatan_id' => $request->kecamatan,
             'kelurahan_id' => $request->kelurahan,
+            'is_cash' => $request->is_cash,
             'created_by' => Auth::id(),
             'updated_by' => null,
         ]);
@@ -70,11 +71,13 @@ class VendorController extends Controller
 
     public function edit($id)
     {
+        $vendor = Vendors::find($id);
+        
         $data['vendors'] = Vendors::findOrFail($id);
         $data['provinsi'] = Provinsi::get();
-        $data['kabupaten'] = Kabupaten::get();
-        $data['kelurahan'] = Kelurahan::get();
-        $data['kecamatan'] = Kecamatan::get();
+        $data['kabupaten'] = Kabupaten::find($vendor->kabupaten_id);
+        $data['kecamatan'] = Kecamatan::find($vendor->kecamatan_id);
+        $data['kelurahan'] = Kelurahan::find($vendor->kelurahan_id);
 
         return view('master.vendor.edit', $data);
     }
@@ -87,10 +90,10 @@ class VendorController extends Controller
             'alamat' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
             'owner' => 'required|string|max:255',
-            'provinsi' => 'required',
-            'kota' => 'required',
-            'kecamatan' => 'required',
-            'kelurahan' => 'required',
+            'provinsi' => 'nullable',
+            'kota' => 'nullable',
+            'kecamatan' => 'nullable',
+            'kelurahan' => 'nullable',
         ]);
 
         $vendor = Vendors::findOrFail($id);
@@ -104,6 +107,7 @@ class VendorController extends Controller
         $vendor->kecamatan_id = $request->kecamatan;
         $vendor->kelurahan_id = $request->kelurahan;
         $vendor->updated_by = Auth::id();
+        $vendor->is_cash = $request->has('is_cash') ? 1 : 0;
 
         try {
             DB::beginTransaction();

@@ -2,12 +2,49 @@
 
 @section('content')
 <div class="container">
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+    
+    <!--Notifikasi-->
+    @if(session()->has('collect_success') || session()->has('collect_error'))
+        <div class="container">
+            <div class="row">
+                <div class="col pl-0">
+                    <div class="alert alert-success alert-dismissable" role="alert" style="max-height: 300px; overflow-y: auto;">
+                        <h3 class="alert-heading font-size-h4 font-w400">Successful Import</h3>
+                        @if(session()->has('collect_success'))
+                            @foreach (session()->get('collect_success', []) as $msg)
+                                <p class="mb-0">{{ $msg }}</p>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+                <div class="col pr-0">
+                    <div class="alert alert-danger alert-dismissable" role="alert" style="max-height: 300px; overflow-y: auto;">
+                        <h3 class="alert-heading font-size-h4 font-w400">Failed Import</h3>
+                        @if(session()->has('collect_error'))
+                            @foreach (session()->get('collect_error', []) as $msg)
+                                <p class="mb-0">{{ $msg }}</p>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
     @endif
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {!! session('success') !!}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {!! session('error') !!}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
@@ -20,6 +57,12 @@
             <a class="btn btn-success" href="{{ route('master.customer.create') }}" role="button">
                 <i class="fa fa-plus" aria-hidden="true"></i> Create
             </a>
+            
+            @if(Auth::user()->role == "dev" OR Auth::user()->role == "admin")
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importExportModal">
+                Manage
+            </button>
+            @endif
 
             <br>
             <br>
@@ -61,6 +104,33 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Import & Export -->
+<div class="modal fade" id="importExportModal" tabindex="-1" aria-labelledby="importExportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importExportModalLabel">Manage Import & Export Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('master.customer.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Import Excel File</label>
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Import</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <a href="{{ route('master.customer.export') }}" class="btn btn-info">Download Template</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')

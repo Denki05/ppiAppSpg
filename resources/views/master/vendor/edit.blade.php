@@ -74,26 +74,49 @@
 
             <div class="col-md-6">
                 <label for="kota" class="form-label">Kota</label>
-                <select class="form-select select2" id="kota" name="kota" required disabled>
-                    <option value="">Pilih Kota</option>
+                <select class="form-select select2" id="kota" name="kota">
+                    @if($kabupaten)
+                        <option value="{{ $kabupaten->id }}" selected>{{ $kabupaten->name }}</option>
+                    @endif
                 </select>
                 @error('kota') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
 
             <div class="col-md-6">
                 <label for="kecamatan" class="form-label">Kecamatan</label>
-                <select class="form-select select2" id="kecamatan" name="kecamatan" required disabled>
-                    <option value="">Pilih Kecamatan</option>
+                <select class="form-select select2" id="kecamatan" name="kecamatan">
+                    @if($kecamatan)
+                        <option value="{{ $kecamatan->id }}" selected>{{ $kecamatan->name }}</option>
+                    @endif
                 </select>
                 @error('kecamatan') <div class="text-danger">{{ $message }}</div> @enderror
             </div>
 
             <div class="col-md-6">
                 <label for="kelurahan" class="form-label">Kelurahan</label>
-                <select class="form-select select2" id="kelurahan" name="kelurahan" required disabled>
-                    <option value="">Pilih Kelurahan</option>
+                <select class="form-select select2" id="kelurahan" name="kelurahan">
+                    @if($kelurahan)
+                        <option value="{{ $kelurahan->id }}" selected>{{ $kelurahan->name }}</option>
+                    @endif
                 </select>
                 @error('kelurahan') <div class="text-danger">{{ $message }}</div> @enderror
+            </div>
+            
+            <!-- checklist cash type -->
+            <div class="col-md-6">
+                <label class="form-label">Is Cash</label>
+                <div class="form-check">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="is_cash" 
+                        id="is_cash" 
+                        value="1" 
+                        {{ old('is_cash', $vendors->is_cash) == 1 ? 'checked' : '' }}>
+                    <label class="form-check-label" for="is_cash">
+                        Iya (centang jika cash)
+                    </label>
+                </div>
             </div>
 
             <div class="mt-4">

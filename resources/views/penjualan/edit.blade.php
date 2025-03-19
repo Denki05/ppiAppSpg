@@ -42,7 +42,7 @@
                         </select>
                     </div>
                 @else
-                    <label class="col-12 col-md-2 col-form-label text-right" for="contact_person">Cash :</label>
+                    <label class="col-12 col-md-2 col-form-label text-right" for="contact_person">Customer :</label>
                     <div class="col-12 col-md-5 mb-2 mb-md-0">
                         <input type="text" class="form-control" value="Cash" readonly>
                     </div>

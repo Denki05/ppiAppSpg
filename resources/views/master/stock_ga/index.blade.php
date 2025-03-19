@@ -2,9 +2,31 @@
 
 @section('content')
 <div class="container">
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+    <!-- Notifikasi -->
+    @if(session()->has('collect_success') || session()->has('collect_error'))
+        <div class="container">
+            <div class="row">
+                <div class="col pl-0">
+                    <div class="alert alert-success alert-dismissable" role="alert" style="max-height: 300px; overflow-y: auto;">
+                        <h3 class="alert-heading font-size-h4 font-w400">Successful Import</h3>
+                        @if(session()->has('collect_success'))
+                            @foreach (session()->get('collect_success', []) as $msg)
+                                <p class="mb-0">{{ $msg }}</p>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+                <div class="col pr-0">
+                    <div class="alert alert-danger alert-dismissable" role="alert" style="max-height: 300px; overflow-y: auto;">
+                        <h3 class="alert-heading font-size-h4 font-w400">Failed Import</h3>
+                        @if(session()->has('collect_error'))
+                            @foreach (session()->get('collect_error', []) as $msg)
+                                <p class="mb-0">{{ $msg }}</p>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
     @endif
 
@@ -18,12 +40,18 @@
 
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <button type="button" class="btn btn-primary" id="openGAModal"><i class="fa fa-plus"></i> Tambah</button>
+            <button type="button" class="btn btn-success" id="openGAModal"><i class="fa fa-plus"></i> Tambah</button>
+            
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importExportModal">
+                Manage
+            </button>
             <br><br>
             <table id="variantStock" class="table table-striped">
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
+                        <th class="text-center">SPG</th>
+                        <th class="text-center">Brand</th>
                         <th class="text-center">Variant</th>
                         <th class="text-center">Botol</th>
                         <th class="text-center">Volume</th>
@@ -38,6 +66,8 @@
                         @endphp
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">{{ $stock->user->name }}</td>
+                            <td class="text-center">{{ $stock->brand_name }}</td>
                             <td class="text-center">
                                 @if($product)
                                     {{ $product['code'] }} - {{ $product['name'] }}
@@ -74,6 +104,15 @@
             </div>
             <div class="modal-body">
                 <form id="gaForm">
+                    <div class="mb-3">
+                        <label for="brandSelect" class="form-label">SPG</label>
+                        <select class="form-control select2" id="spgSelect" name="spg">
+                            <option value="">Pilih SPG</option>
+                            @foreach($user as $row)
+                            <option value="{{ $row->id }}">{{ $row->email }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="mb-3">
                         <label for="brandSelect" class="form-label">Variant</label>
                         <select class="form-control select2" id="brandSelect" name="brand">
@@ -125,6 +164,32 @@
         </div>
     </div>
 </div>
+
+<!-- Import Stock GA -->
+<div class="modal fade" id="importExportModal" tabindex="-1" aria-labelledby="importExportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importExportModalLabel">Manage Import & Export Stock GA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('stock_ga.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Import Excel File</label>
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Import</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <a href="{{ route('stock_ga.export') }}" class="btn btn-info">Download Template</a>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -142,6 +207,21 @@
     }
 
     $(document).ready(function () {
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(function() {
+                let alerts = document.querySelectorAll(".alert");
+                alerts.forEach(alert => {
+                    let bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000); // 5000ms = 5 detik
+        });
+        
+        $('#spgSelect').select2({
+            width: '100%',
+            dropdownParent: $('#gaModalLabel'), // Ensures the dropdown stays within the modal
+        });
+        
         $('#brandSelect').select2({
             width: '100%',
             dropdownParent: $('#gaModalLabel'), // Ensures the dropdown stays within the modal
@@ -151,13 +231,17 @@
             width: '100%',
             dropdownParent: $('#gaModalLabel'), // Ensures the dropdown stays within the modal
         });
-
-        var gaTable = $('#variantStock').DataTable({
-            paging: false,
-            bInfo: false,
-            searching: false,
-            ordering: false,
-        });
+        
+        $('#variantStock').DataTable({
+           paging: true,
+           pageLength: 5,
+           lengthMenu: [5, 25, 50, 100],
+           order: [[1, 'asc']],
+           responsive: true, // Enable responsiveness
+           columnDefs: [
+               { targets: [0, 5], orderable: false } // Disable sorting on # and Action columns
+           ]
+       });
 
         var product_data = []; // Declare product_data globally
 

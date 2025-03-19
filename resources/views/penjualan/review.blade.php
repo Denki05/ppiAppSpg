@@ -61,11 +61,13 @@
                                     CASH
                                 @endif
                             </td>
+                            @if(Auth::user()->role == 'admin' || Auth::user()->role == 'dev')
                             <td class="text-center">
-                                @if(Auth::user()->role == 'admin' || Auth::user()->role == 'dev')
+                                
                                     {{ $sale->createdByUser() ?? '-' }}
-                                @endif
+                               
                             </td>
+                             @endif
                             <td>
                                 <a href="{{ route('penjualan.edit', encrypt($sale->id)) }}" class="btn btn-warning"><i class="fa fa-edit" aria-hidden="true"></i></a>
                                 <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saleModal{{ $sale->id }}">
@@ -204,6 +206,10 @@
            responsive: true, // Enable responsiveness
            order: [[2, 'desc']]  // Ensure the table starts from the last row (counter)
        });
+       
+       setTimeout(function() {
+            $(".alert").fadeOut('slow');
+        }, 2000);
    });
 </script>
 @endsection

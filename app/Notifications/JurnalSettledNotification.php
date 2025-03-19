@@ -45,9 +45,9 @@ class JurnalSettledNotification extends Notification
     {
         return [
             'jurnal_id' => $this->jurnal->id,
-            'jurnal_code' => $this->jurnal->code,
+            'jurnal_kode' => $this->jurnal->kode,
             'status' => $this->jurnal->status,
-            'message' => 'Jurnal ' . $this->jurnal->code . ' telah di proses settel oleh sistem.',
+            'message' => 'Jurnal ' . $this->jurnal->kode . ' telah di proses settel oleh sistem.',
             'tanggal_order' => $this->jurnal->tanggal_order,
             'settel_by' => $this->so->settel_by ?? null,
         ];

@@ -79,11 +79,15 @@ Route::get('/master/customer/show/{id}', [CustomerController::class, 'show'])->n
 Route::get('/master/customer/edit/{id}', [CustomerController::class, 'edit'])->name('master.customer.edit');
 Route::put('/master/customer/update/{id}', [CustomerController::class, 'update'])->name('master.customer.update');
 Route::delete('/master/customer/destroy/{id}', [CustomerController::class, 'destroy'])->name('master.customer.destroy');
+Route::get('/master/customer/export', [CustomerController::class, 'export'])->name('master.customer.export');
+Route::post('/master/customer/import', [CustomerController::class, 'import'])->name('master.customer.import');
 
 // Stock GA
 Route::get('/stock_ga', [StockGaController::class, 'index'])->name('stock_ga.index');
 Route::post('/stock_ga/store', [StockGaController::class, 'store'])->name('stock_ga.store');
 Route::patch('/stock_ga/addStock/{id}', [StockGaController::class, 'addStock'])->name('stock_ga.addStock');
+Route::get('/stock_ga/export', [StockGaController::class, 'export'])->name('stock_ga.export');
+Route::post('/stock_ga/import', [StockGaController::class, 'import'])->name('stock_ga.import');
 
 // vendor
 Route::get('/master/vendor', [VendorController::class, 'index'])->name('master.vendor.index');

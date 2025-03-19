@@ -30,7 +30,7 @@
             <input type="hidden" value="GCF" name="brand_name" id="brand_name">
 
             <!-- Customer selection section -->
-            <div class="form-group row" id="customerForm">
+            <div class="form-group row" id="customerForm">    
                 <label class="col-12 col-md-2 col-form-label text-right" for="contact_person">Customer :</label>
                 <div class="col-12 col-md-5 mb-2 mb-md-0">
                     <select name="customer_dom" id="customer_dom" class="form-control select2" style="width: 100%;">
@@ -44,13 +44,25 @@
                 </div>
             </div>
 
-            <!-- Cash option -->
+            <!-- Checkbox Is Cash -->
+            @if($users->vendor->is_cash == 1 || Auth::user()->role == "admin" || Auth::user()->role == "dev")
             <div class="form-group row">
-                <label class="col-12 col-md-2 col-form-label text-right" for="flexCheckDefault">Cash :</label>
-                <div class="col-12 col-md-10 d-flex align-items-center">
-                    <input class="form-check-input" type="checkbox" value="1" id="customerCash" name="customerCash" style="border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);">
+                <label class="col-12 col-md-2 col-form-label text-right" for="is_cash">Cash :</label>
+                <div class="col-12 col-md-10">
+                    <input type="checkbox" name="customerCash" id="customerCash" value="1">
                 </div>
             </div>
+            @endif
+            
+            @if(Auth::user()->role == "dev" OR Auth::user()->role == "admin")
+            <div class="form-group row">
+                <label class="col-12 col-md-2 col-form-label text-right" for="flexCheckDefault">Note :</label>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success" id="openTransaksiSisipan"><i class="fa fa-plus"></i></button>
+                </div>
+            </div>
+            @endif
+            
             <hr>
 
             <!-- Give Away Section -->
@@ -88,7 +100,7 @@
                             <thead>
                                 <tr>
                                     <th style="min-width: 150px;">Variant</th>
-                                    <th style="min-width: 60px;">Qty</th>
+                                    <th style="min-width: 60px;">Mililiter (ml)</th>
                                     <th style="min-width: 40px;">Action</th>
                                 </tr>
                             </thead>
@@ -101,6 +113,38 @@
             <div class="mt-4">
                 <a class="btn btn-danger" href="{{ route('home') }}" role="button">Back</a>
                 <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            
+            <!-- Modal Note -->
+            <div class="modal fade" id="transaksiSisipanModal" tabindex="-1" aria-labelledby="transaksiSisipanLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="transaksiSisipanLabel">Tambah Transaksi Sisipan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="transaksiSisipanForm">
+                                <div class="mb-3">
+                                    <label for="spg_name_sisipan" class="form-label">SPG</label>
+                                    <select class="form-control select2" id="spg_name_sisipan" name="spg_name">
+                                        <option value="">Pilih SPG</option>
+                                        @foreach($user as $key)
+                                        <option value="{{ $key->id }}">{{ $key->name }} / {{ $key->email }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tanggal_jurnal_sisipan" class="form-label">Tanggal</label>
+                                    <input type="date" class="form-control" id="tanggal_jurnal_sisipan" name="tanggal_jurnal">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -220,13 +264,6 @@ $(document).ready(function () {
     // Load customer data on page load
     loadCustomerData('DOM');
     loadCustomerData('OUTDOM');
-
-    // Checkbox visibility handling
-    $('#customerCash').on('change', function () {
-        let isChecked = $(this).is(':checked');
-        $('#customerForm').toggle(!isChecked); // Show/hide customer dropdowns
-        $('#customer_dom, #customer_non_dom').prop('disabled', isChecked); // Disable if checked
-    });
 
     var product_data = []; // Declare product_data globally
 
@@ -380,6 +417,43 @@ $(document).ready(function () {
     // Delete row functionality for Transaksi table
     $(document).on('click', '.delete-row', function () {
         transaksiTable.row($(this).closest('tr')).remove().draw();
+    });
+    
+    // Open modal transaksi sisipan
+    $('#openTransaksiSisipan').on('click', function () {
+        $('#transaksiSisipanModal').modal('show');
+
+        // Initialize select2
+        $('#spg_name_sisipan').select2({
+            dropdownParent: $('#transaksiSisipanModal'),
+            width: '100%',
+        });
+    });
+    
+    setTimeout(function() {
+        $(".alert").fadeOut('slow');
+    }, 2000);
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        let isCashCheckbox = document.getElementById('is_cash');
+        let customerForm = document.getElementById('customerForm');
+        
+        function toggleCustomerForm() {
+            let isCash = isCashCheckbox.checked ? 1 : 0;
+            let userRole = "{{ Auth::user()->role }}";
+
+            if (userRole === "admin" || userRole === "dev" || isCash === 0) {
+                customerForm.style.display = "flex"; // Tampilkan jika admin/dev atau is_cash = 0
+            } else {
+                customerForm.style.display = "none"; // Sembunyikan jika is_cash = 1
+            }
+        }
+
+        // Jalankan saat halaman dimuat
+        toggleCustomerForm();
+
+        // Jalankan saat checkbox diubah
+        isCashCheckbox.addEventListener("change", toggleCustomerForm);
     });
 });
 </script>

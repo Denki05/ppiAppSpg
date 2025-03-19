@@ -39,3 +39,13 @@
     @endif
 </div>
 @endsection
+
+@section('scripts')
+<script type="text/javascript">
+    $(document).ready(function () {
+        setTimeout(function() {
+            $(".alert").fadeOut('slow');
+        }, 2000);
+    });
+</script>
+@endsection

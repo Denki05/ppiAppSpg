@@ -27,11 +27,11 @@ class UpdateJurnalStatusCommand extends Command
             $jurnal->settel_by = '1'; // Setel by AUTO
             $jurnal->save();
 
-            $userIds = [3, 9];
+            $userIds = [3, 9, 12];
             $users = User::whereIn('id', $userIds)->get();
 
             foreach ($users as $user) {
-                $user->notify(new JurnalSettledNotification($penjualan));
+                $user->notify(new JurnalSettledNotification($jurnal));
             }
 
             // Opsional: Log perubahan

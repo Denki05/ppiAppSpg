@@ -12,6 +12,9 @@ use App\Models\Master\Kelurahan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CustomerTemplateExport;
+use App\Imports\CustomerImport;
 
 class CustomerController extends Controller
 {
@@ -134,5 +137,29 @@ class CustomerController extends Controller
         }
 
         return redirect()->route('master.customer.index')->with('error', 'Customer not found.');
+    }
+    
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            $import = new CustomerImport();
+            Excel::import($import, $request->file('file'));
+
+            return redirect()->back()->with([
+                'collect_success' => $import->success,
+                'collect_error' => $import->error
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function export()
+    {
+        return Excel::download(new CustomerTemplateExport, 'customer_template.xlsx');
     }
 }

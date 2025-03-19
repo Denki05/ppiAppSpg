@@ -13,6 +13,7 @@ class StockGa extends Model
     protected $table = "stock_ga";
     protected $fillable = [
         'product_id', 
+        'user_id',
         'brand_name', 
         'qty',
         'pcs',
@@ -22,7 +23,7 @@ class StockGa extends Model
 
     public function getProductDataFromApi($productId)
     {
-        $response = Http::get("http://ppiapps.sytes.net:8000/api/products");
+        $response = Http::get("https://lssoft88.xyz/api/products");
 
         if ($response->successful()) {
             $products = $response->json();
@@ -36,5 +37,9 @@ class StockGa extends Model
 
         return null;
     }
-
+    
+    public function user()
+    {
+        return $this->BelongsTo('App\Models\User', 'user_id', 'id');
+    }
 }
