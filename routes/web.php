@@ -7,6 +7,7 @@ use App\Http\Controllers\Master\CustomerController;
 use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Master\StockGaController;
 use App\Http\Controllers\Master\WilayahController;
+use App\Http\Controllers\Report\ReportJurnalDailyController;
 use App\Http\Controllers\ApiConsumerController;
 use App\Http\Controllers\HomeController;
 
@@ -97,6 +98,9 @@ Route::get('/master/vendor/show/{id}', [VendorController::class, 'show'])->name(
 Route::get('/master/vendor/edit/{id}', [VendorController::class, 'edit'])->name('master.vendor.edit');
 Route::put('/master/vendor/update/{id}', [VendorController::class, 'update'])->name('master.vendor.update');
 Route::delete('/master/vendor/destroy/{id}', [VendorController::class, 'destroy'])->name('master.vendor.destroy');
+
+// Reports
+Route::get('/report/jurnal_daily', [ReportJurnalDailyController::class, 'index'])->name('report.jurnal_daily.index');
 
 // Wilayah
 Route::get('/master/wilayah', [WilayahController::class, 'index'])->name('master.wilayah.index');
