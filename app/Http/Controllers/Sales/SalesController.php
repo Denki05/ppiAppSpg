@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class SalesController extends Controller
 {
@@ -84,56 +85,94 @@ class SalesController extends Controller
         return view('penjualan.settle', $data);
     }
 
-    public function create_senses(Request $request)
+    public function create_senses(Request $request, ApiConsumerController $apiConsumer)
     {
-        // Fetch product data from ApiConsumerController
-        $apiConsumer = new ApiConsumerController();
-        $data['products'] = $apiConsumer->getItemsProducts();
-        $data['brands'] = $apiConsumer->getItemsBrands();
-        $data['customer'] = Customer::get();
-        $data['users'] = Auth::user();
-        
-        $stockGaItems = StockGa::where('brand_name', 'Senses')->where('user_id', Auth::id())->get();
-        $data['stock_ga'] = $stockGaItems->map(function ($item) {
-            $productData = $item->getProductDataFromApi($item->product_id);
+        // Fetch API Data in One Call
+        $products = $apiConsumer->getItemsProducts();
+        $brands = $apiConsumer->getItemsBrands();
+    
+        // Fetch Users & Customers
+        $customers = Customer::all();
+        $currentUser = Auth::user();
+        $spgUsers = User::where('role', "spg")->get();
+    
+        // Fetch Stock GA for Current User with Brand 'Senses'
+        $stockGaItems = StockGa::where('brand_name', 'Senses')
+                        ->where('user_id', $currentUser->id)
+                        ->get(['id', 'product_id']);
+    
+        // Get Product IDs from Stock GA
+        $productIds = $stockGaItems->pluck('product_id')->toArray();
+    
+        // Fetch Product Details from API
+        $productDataMap = collect($products)->keyBy('id');
+    
+        // Format Stock GA Data
+        $stockGa = $stockGaItems->map(function ($item) use ($productDataMap) {
+            $productData = $productDataMap->get($item->product_id, []);
+    
             return [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
-                'name' => $productData['name'] ?? null,
-                'code' => $productData['code'] ?? null,
+                'name' => $productData['name'] ?? 'Nama Tidak Ditemukan',
+                'code' => $productData['code'] ?? 'Kode Tidak Ditemukan',
             ];
         });
-        
-        $data['user'] = User::where('role', "spg")->get();
-
-        // Pass the product and unit weight data to the view
-        return view('penjualan.create_senses', $data);
+    
+        // Pass Data to View
+        return view('penjualan.create_senses', [
+            'products' => $products,
+            'brands' => $brands,
+            'customer' => $customers,
+            'users' => $currentUser,
+            'stock_ga' => $stockGa,
+            'user' => $spgUsers,
+        ]);
     }
 
-    public function create_gcf(Request $request)
+    public function create_gcf(Request $request, ApiConsumerController $apiConsumer)
     {
-        // Fetch product data from ApiConsumerController
-        $apiConsumer = new ApiConsumerController();
-        $data['products'] = $apiConsumer->getItemsProducts();
-        $data['brands'] = $apiConsumer->getItemsBrands();
-        $data['customer'] = Customer::get();
-        $data['users'] = Auth::user();
-        
-        $stockGaItems = StockGa::where('brand_name', 'GCF')->where('user_id', Auth::id())->get();
-        $data['stock_ga'] = $stockGaItems->map(function ($item) {
-            $productData = $item->getProductDataFromApi($item->product_id);
+        // Fetch API Data in One Call
+        $products = $apiConsumer->getItemsProducts();
+        $brands = $apiConsumer->getItemsBrands();
+    
+        // Fetch Users & Customers
+        $customers = Customer::all();
+        $currentUser = Auth::user();
+        $spgUsers = User::where('role', "spg")->get();
+    
+        // Fetch Stock GA for Current User with Brand 'Senses'
+        $stockGaItems = StockGa::where('brand_name', 'GCF')
+                        ->where('user_id', $currentUser->id)
+                        ->get(['id', 'product_id']);
+    
+        // Get Product IDs from Stock GA
+        $productIds = $stockGaItems->pluck('product_id')->toArray();
+    
+        // Fetch Product Details from API
+        $productDataMap = collect($products)->keyBy('id');
+    
+        // Format Stock GA Data
+        $stockGa = $stockGaItems->map(function ($item) use ($productDataMap) {
+            $productData = $productDataMap->get($item->product_id, []);
+    
             return [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
-                'name' => $productData['name'] ?? null,
-                'code' => $productData['code'] ?? null,
+                'name' => $productData['name'] ?? 'Nama Tidak Ditemukan',
+                'code' => $productData['code'] ?? 'Kode Tidak Ditemukan',
             ];
         });
-        
-        $data['user'] = User::where('role', "spg")->get();
-
-        // Pass the product and unit weight data to the view
-        return view('penjualan.create_gcf', $data);
+    
+        // Pass Data to View
+        return view('penjualan.create_gcf', [
+            'products' => $products,
+            'brands' => $brands,
+            'customer' => $customers,
+            'users' => $currentUser,
+            'stock_ga' => $stockGa,
+            'user' => $spgUsers,
+        ]);
     }
 
     public function store(Request $request)
@@ -449,9 +488,9 @@ class SalesController extends Controller
 
     public function checkCustomerDOM()
     {
-        $user = User::find(Auth::id());
+        $user = Auth::user(); // Ambil user yang login
         $area = $user->area;
-
+    
         // Query dasar menggunakan Eloquent
         $query = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
             ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
@@ -459,28 +498,36 @@ class SalesController extends Controller
             ->select(
                 'master_customer.id as customer_id',
                 'master_customer.nama as customer_nama',
+                'master_customer.owner as customer_owner',
                 'districts.name as customer_kecamatan',
                 'regencies.name as customer_kota',
                 'provinces.name as customer_provinsi'
             );
-
-        // Kondisi jika area tidak ada (default ke provinsi dan kabupaten user)
-        if ($area == null) {
-            $query->where('master_customer.provinsi_id', $user->provinsi_id)
-                ->where('master_customer.kabupaten_id', $user->kabupaten_id)
-                ->where('master_customer.user_id', $user->id);
-        } else {
-            // Filter berdasarkan area dan user login
-            $query->where('regencies.area', $area)
-                ->where('master_customer.user_id', $user->id);
+    
+        // Jika user adalah Admin atau Dev, tampilkan semua customer
+        if ($user->role == "admin" || $user->role == "dev") {
+            // Tidak ada tambahan kondisi, semua data customer akan ditampilkan
+        } 
+        // Jika user adalah SPG, filter berdasarkan user_id
+        else {
+            if ($area == null) {
+                // Jika area null, hanya tampilkan data yang sesuai dengan user
+                $query->where('master_customer.provinsi_id', $user->provinsi_id)
+                    ->where('master_customer.kabupaten_id', $user->kabupaten_id)
+                    ->where('master_customer.user_id', $user->id);
+            } else {
+                // Filter berdasarkan area dan user login
+                $query->where('regencies.area', $area)
+                    ->where('master_customer.user_id', $user->id);
+            }
         }
-
+    
         // Eksekusi query
         $customers = $query->orderBy('master_customer.nama', 'asc')->get();
-
+    
         // Placeholder
         $cityPlaceholder = $area ?? 'Kota/Kabupaten';
-
+    
         // Response JSON
         return response()->json([
             'customers' => $customers,
@@ -490,34 +537,39 @@ class SalesController extends Controller
 
     public function checkCustomerOUTDOM()
     {
-        $user = User::find(Auth::id());
+        $user = Auth::user(); // Ambil user yang login
         $area = $user->area;
     
-        // Query menggunakan Eloquent
-        $customers = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
+        // Query dasar menggunakan Eloquent
+        $query = Customer::leftJoin('provinces', 'provinces.id', '=', 'master_customer.provinsi_id')
             ->leftJoin('regencies', 'regencies.id', '=', 'master_customer.kabupaten_id')
-            ->where(function ($query) use ($area, $user) {
-                if ($area) {
-                    // Jika area ada, filter regencies.area tidak sama dengan area
-                    $query->where('regencies.area', null)
-                        ->where('master_customer.provinsi_id', '=', $user->provinsi_id)
-                        ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
-                        ->where('master_customer.user_id', $user->id);
-                } else {
-                    // Jika area null, filter berdasarkan provinsi_id dan kabupaten_id
-                    $query->where('master_customer.provinsi_id', $user->provinsi_id)
-                          ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
-                          ->where('master_customer.user_id', $user->id);
-                }
-            })
             ->select(
                 'master_customer.id as customer_id',
                 'master_customer.nama as customer_nama',
                 'regencies.name as customer_kota',
                 'provinces.name as customer_provinsi'
-            )
-            ->orderBy('master_customer.nama', 'asc')
-            ->get();
+            );
+    
+        // Jika user adalah Admin atau Dev, tampilkan semua customer di luar area
+        if ($user->role == "admin" || $user->role == "dev") {
+            // Admin & Dev dapat melihat semua customer tanpa filter user_id
+            if ($area) {
+                $query->where('regencies.area', '!=', $area); // Ambil customer di luar area admin/dev
+            }
+        } else {
+            // Jika SPG, hanya bisa melihat customer yang mereka input tetapi di luar area mereka
+            if ($area) {
+                $query->where('regencies.area', '!=', $area)
+                    ->where('master_customer.user_id', $user->id);
+            } else {
+                $query->where('master_customer.provinsi_id', $user->provinsi_id)
+                    ->where('master_customer.kabupaten_id', '!=', $user->kabupaten_id)
+                    ->where('master_customer.user_id', $user->id);
+            }
+        }
+    
+        // Eksekusi query
+        $customers = $query->orderBy('master_customer.nama', 'asc')->get();
     
         // Placeholder
         $cityPlaceholder = $area ?? 'Kota/Kabupaten';
@@ -527,5 +579,162 @@ class SalesController extends Controller
             'customers' => $customers,
             'placeholder' => "Pilih Luar $cityPlaceholder"
         ]);
+    }
+
+    public function edit_settel(ApiConsumerController $apiConsumer, $id)
+    {
+        try {
+            // Decrypt ID and fetch sales order
+            $decryptedId = Crypt::decrypt($id);
+            $sales = SalesOrder::findOrFail($decryptedId);
+            $sales_items = SalesOrderItem::where('so_id', $sales->id)->get();
+            $sales_ga = SalesOrderGa::where('so_id', $sales->id)->get();
+
+            // Fetch API Data with validation
+            $products = $apiConsumer->getItemsProducts() ?? [];
+
+            // Fetch Users & Customers
+            $customers = Customer::all();
+            $currentUser = Auth::user();
+            $spgUsers = User::where('role', "spg")->get();
+
+            // Fetch Stock GA for Current User with the given Brand Name
+            $stockGaItems = StockGa::when($sales->brand_name, function ($query) use ($sales) {
+                    return $query->where('brand_name', $sales->brand_name);
+                })
+                ->where('user_id', $currentUser->id)
+                ->get(['id', 'product_id']);
+
+            // Map product data from API
+            $productDataMap = collect($products)->keyBy('id');
+
+            // Format Stock GA Data
+            $stockGa = $stockGaItems->map(function ($item) use ($productDataMap) {
+                $productData = $productDataMap->get($item->product_id, []);
+
+                return [
+                    'id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'name' => $productData['name'] ?? 'Nama Tidak Ditemukan',
+                    'code' => $productData['code'] ?? 'Kode Tidak Ditemukan',
+                ];
+            });
+
+            // Return view with data
+            return view('penjualan.edit_settel', [
+                'products' => $products,
+                'customers' => $customers,
+                'sales' => $sales,
+                'sales_items' => $sales_items,
+                'sales_ga' => $sales_ga,
+                'users' => $currentUser,
+                'stock_ga' => $stockGa,
+                'spgUsers' => $spgUsers,
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('penjualan.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function update_settel(Request $request, $id)
+    {
+        // dd($request->all());
+        $validated = $request->validate([
+            'customer' => 'nullable|exists:master_customer,id',
+            'variant' => 'nullable|array',
+            'qty' => 'nullable|array',
+            'qty.*' => 'nullable|numeric|min:1',
+            'transaksi' => 'required|array',
+            'transaksi_qty' => 'required|array',
+            'transaksi_qty.*' => 'required|numeric|min:1',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            // Update SalesOrder
+            $sale_order = SalesOrder::findOrFail($id);
+            $sale_order->customer_id = $request->customer;
+            $sale_order->tanggal_order = $request->tanggal_jurnal;
+            $sale_order->updated_by = Auth::id();
+            $sale_order->save();
+
+            // Restore the previous stock before deleting SalesOrderGa
+            $default_ml_pcs = 45;
+            $previousSalesGa = SalesOrderGa::where('so_id', $sale_order->id)->get();
+            foreach ($previousSalesGa as $salesGa) {
+                $stock = StockGa::where('product_id', $salesGa->product_packaging_id)->first();
+                if ($stock) {
+                    // calculate stock pcs
+                    $getStockGaPcs = $salesGa->pcs;
+                    $stock->pcs += $getStockGaPcs;
+
+                    // calculate stock volume
+                    $getStockGaVolume = $getStockGaPcs * $default_ml_pcs;
+                    $stock->qty += $getStockGaVolume;
+
+                    $stock->save();
+                }
+            }
+
+            SalesOrderGa::where('so_id', $sale_order->id)->delete();
+
+            if ($request->has('variant') && $request->has('qty')) {
+                foreach ($request->variant as $index => $variantId) {
+                    $stock = StockGa::where('product_id', $variantId)->first();
+                    // dd($stock->qty);
+
+                    if (!$stock || $stock->qty < ($request->qty[$index] * $default_ml_pcs)) {
+                        DB::rollback();
+                        return redirect()->back()->withErrors(['error' => 'Insufficient stock for variant: ' . $variantId]);
+                    }
+
+                    SalesOrderGa::create([
+                        'so_id' => $sale_order->id,
+                        'product_packaging_id' => $variantId,
+                        'pcs' => $request->qty[$index],
+                    ]);
+
+                    // Calculate stock volume
+                    $stockBefore = $stock->qty;
+                    $stockGetVolume = $request->qty[$index] * 45;
+                    $calculateStock = $stockBefore - $stockGetVolume;
+                    $stock->qty = $calculateStock;
+
+                    // dd($calculateStock);
+
+                    // Calculate stock pcs
+                    $stockBeforePcs = $stock->pcs;
+                    $stockGetPcs = $request->qty[$index];
+                    $calculatePcs = $stockBeforePcs - $stockGetPcs;
+                    $stock->pcs = $calculatePcs;
+
+                    // dd($calculatePcs);
+                    $stock->save();
+                }
+            }
+
+            // Update SalesOrderItem
+            SalesOrderItem::where('so_id', $sale_order->id)->delete();
+
+            foreach ($request->transaksi as $index => $productId) {
+                SalesOrderItem::create([
+                    'so_id' => $sale_order->id,
+                    'product_id' => $productId,
+                    'qty' => $request->transaksi_qty[$index],
+                    'unit_weight' => 1,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Jurnal berhasil diupdate.');
+
+        }catch (\Exception $e) {
+            dd($e);
+            DB::rollback();
+            Log::error('Error updating SalesOrder', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'An error occurred while updating the data.');
+        }
     }
 }

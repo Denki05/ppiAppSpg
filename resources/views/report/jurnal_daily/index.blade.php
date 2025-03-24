@@ -31,6 +31,7 @@
                                     <tr>
                                         <th class="text-center">#</th>
                                         <th class="text-center">Tanggal</th>
+                                        <th class="text-center">SPG</th>
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">Kode</th>
                                         <th class="text-center">Brand</th>
@@ -42,6 +43,7 @@
                                         <tr>
                                             <td class="text-center">{{ $loop->iteration }}</td>
                                             <td class="text-center">{{ \Carbon\Carbon::parse($row->tanggal_jurnal)->format('d-m-Y') }}</td>
+                                            <td class="text-center">{{ $row->spg }}</td>
                                             <td class="text-center">{{ $row->customer }}</td>
                                             <td class="text-center">{{ $row->kode_jurnal }}</td>
                                             <td class="text-center">{{ $row->brand_jurnal }}</td>
@@ -84,7 +86,7 @@
             pageLength: 10,
             lengthMenu: [10, 25, 50, 100],
             responsive: true,
-            order: [[2, 'asc']],
+            order: [[1, 'asc']],
             dom: "<'row'<'col-sm-2'l><'col-sm-7 text-left'B><'col-sm-3'f>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-5'i><'col-sm-7'p>>",

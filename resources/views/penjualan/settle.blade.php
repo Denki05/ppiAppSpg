@@ -63,6 +63,10 @@
                                 @endif
                             </td>
                             <td>
+                                @if(Auth::user()->role == "dev" || Auth::user()->role == "admin")
+                                    <a href="{{ route('penjualan.edit_settel', encrypt($sale->id)) }}" class="btn btn-warning"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                @endif
+
                                 <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#saleModal{{ $sale->id }}">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </button>

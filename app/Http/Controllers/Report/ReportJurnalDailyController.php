@@ -40,9 +40,16 @@ class ReportJurnalDailyController extends Controller
                         WHEN penjualan_so.status = 3 THEN 'SETTEL'
                     END AS status_jurnal
                 "),
-                DB::raw("COALESCE(SUM(penjualan_so_item.qty), 0) AS total_qty")
+                DB::raw("COALESCE(SUM(penjualan_so_item.qty), 0) AS total_qty"),
+                DB::raw("
+                    CASE 
+                        WHEN penjualan_so.created_by IN (3, 8, 9, 10, 11, 12, 13, 14) 
+                        THEN users.name 
+                        ELSE 'UNKNOWN'
+                    END AS spg
+                ")
             )
-            ->groupBy('penjualan_so.id', 'penjualan_so.created_at', 'penjualan_so.kode', 'penjualan_so.brand_name', 'penjualan_so.customer_id', 'master_customer.nama', 'penjualan_so.status')
+            ->groupBy('penjualan_so.id', 'penjualan_so.created_at', 'penjualan_so.kode', 'penjualan_so.brand_name', 'penjualan_so.customer_id', 'master_customer.nama', 'penjualan_so.status', 'penjualan_so.created_by', 'users.name')
             ->get();
 
         $data = [
