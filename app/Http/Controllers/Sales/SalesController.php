@@ -33,7 +33,7 @@ class SalesController extends Controller
         return view('penjualan.index', $data);
     }
 
-    public function review()
+    public function review_page()
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
@@ -60,23 +60,20 @@ class SalesController extends Controller
         return view('penjualan.review', $data);
     }
 
-    public function settle(Request $request)
+    public function settle_page(Request $request)
     {
-        $currentMonth = Carbon::now()->month;
-        $currentYear = Carbon::now()->year;
+        $now = Carbon::now();
         $user = Auth::user();
 
         if ($user->role === 'dev' || $user->role === 'admin') {
             // Filter data for the current month and year without date
-            $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
-                                    ->whereYear('tanggal_order', $currentYear)
+            $data['sales'] = SalesOrder::whereRaw('MONTH(tanggal_order) = ? AND YEAR(tanggal_order) = ?', [$now->month, $now->year])
                                     ->where('status', 3)
                                     ->get();
         } else {
             // Filter data for the current month, year, and date
             $currentDate = Carbon::now()->toDateString();
-            $data['sales'] = SalesOrder::whereMonth('tanggal_order', $currentMonth)
-                                    ->whereYear('tanggal_order', $currentYear)
+            $data['sales'] = SalesOrder::whereRaw('MONTH(tanggal_order) = ? AND YEAR(tanggal_order) = ?', [$now->month, $now->year])
                                     ->where('status', 3)
                                     ->where('created_by', $user->id)
                                     ->get();

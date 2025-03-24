@@ -151,7 +151,7 @@
                                                                     <tr>
                                                                         <td>{{ $loop->iteration }}</td>
                                                                         <td>{{ $productData['code'] ?? 'Unknown Product' }} - {{ $productData['name'] ?? 'Unknown Product' }}</td>
-                                                                        <td>{{ $key->qty }}</td>
+                                                                        <td>{{ $key->pcs }}</td>
                                                                     </tr>
                                                                     @if(!$productData)
                                                                         <tr>

@@ -279,12 +279,12 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('penjualan.review') }}">
+                                <a class="nav-link" href="{{ route('penjualan.review_page') }}">
                                     <i class="fa-solid fa-eye"></i> Review
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('penjualan.settle') }}">
+                                <a class="nav-link" href="{{ route('penjualan.settle_page') }}">
                                     <i class="fa-solid fa-check"></i> Settel
                                 </a>
                             </li>

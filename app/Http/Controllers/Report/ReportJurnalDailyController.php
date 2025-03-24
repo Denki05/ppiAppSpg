@@ -21,6 +21,7 @@ class ReportJurnalDailyController extends Controller
     {   
         $get_data = SalesOrder::whereIn('penjualan_so.status', [1, 2, 3])
             ->leftJoin('penjualan_so_item', 'penjualan_so.id', '=', 'penjualan_so_item.so_id')
+            ->leftJoin('penjualan_ga', 'penjualan_so.id', '=', 'penjualan_ga.so_id')
             ->leftJoin('master_customer', 'penjualan_so.customer_id', '=', 'master_customer.id')
             ->leftJoin('users', 'penjualan_so.created_by', '=', 'users.id')
             ->select(
@@ -41,6 +42,7 @@ class ReportJurnalDailyController extends Controller
                     END AS status_jurnal
                 "),
                 DB::raw("COALESCE(SUM(penjualan_so_item.qty), 0) AS total_qty"),
+                DB::raw("COALESCE(SUM(penjualan_ga.pcs), 0) AS total_qty_ga"),
                 DB::raw("
                     CASE 
                         WHEN penjualan_so.created_by IN (3, 8, 9, 10, 11, 12, 13, 14) 
@@ -52,8 +54,11 @@ class ReportJurnalDailyController extends Controller
             ->groupBy('penjualan_so.id', 'penjualan_so.created_at', 'penjualan_so.kode', 'penjualan_so.brand_name', 'penjualan_so.customer_id', 'master_customer.nama', 'penjualan_so.status', 'penjualan_so.created_by', 'users.name')
             ->get();
 
+        $sales = User::where('role', 'spg')->get();
+
         $data = [
             'get_data' => $get_data,
+            'sales' => $sales,
         ];
 
         return view('report.jurnal_daily.index', $data);
